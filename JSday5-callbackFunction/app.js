@@ -133,3 +133,104 @@ function divide(x, y) {
 }
 console.log(calculate(20, 10, multiply));
 console.log(calculate(20, 10, divide));
+
+// 13
+function calculate(a, b, operation) {
+  console.log("Performing the operation...");
+  return operation(a, b);
+}
+function max(x, y) {
+  return x > y;
+}
+function min(x, y) {
+  return x < y;
+}
+console.log(calculate(8, 12, max));
+console.log(calculate(8, 12, min));
+
+// 14
+function calculate(a, b, operation) {
+  console.log("Performing the operation...");
+  return operation(a, b);
+}
+function power(x, y) {
+  console.log("power function fires...");
+  return x ** y;
+}
+function modulus(x, y) {
+  return x % y;
+}
+console.log(calculate(2, 3, power));
+console.log(calculate(2, 3, modulus));
+
+// 15
+function manipulateStrings(str1, str2, operation) {
+  console.log("Performing the operation...");
+  return operation(str1, str2); // callback-function calls
+}
+function concatenate(a, b) {
+  return a + b;
+}
+
+function reverseConcatenate(a, b) {
+  return b + a;
+}
+console.log(manipulateStrings("hello", "world", concatenate));
+console.log(manipulateStrings("hello", "world", reverseConcatenate));
+// 'A callback function("concatenate") is a function that is passed as an argument to another function("manipulateStrings") and is executed after the outer function has completed it's task.'
+
+// Average of three numbers
+function averageOfThreeNumbers(num1, num2, num3, callback) {
+  const sum = num1 + num2 + num3;
+  const avg = sum / 3;
+  callback(avg);
+  // return avg;
+}
+averageOfThreeNumbers(10, 20, 30, function (avg) {
+  console.log("Average", avg);
+});
+
+function averageOfThreeNumbers(num1, num2, num3, callback) {
+  const sum = num1 + num2 + num3;
+  const avg = sum / 3;
+  callback(avg);
+  // return avg;
+}
+function logAverage(avg) {
+  console.log("Average", avg);
+}
+averageOfThreeNumbers(10, 20, 30, logAverage);
+
+function averageOfThree(num1, num2, num3, callback) {
+  const sum = num1 + num2 + num3;
+  const avg = sum / 3;
+  callback(avg); // This is the function that will be call later.
+}
+averageOfThree(5, 10, 15, function (average) {
+  console.log("The average is:", average);
+});
+
+function showSomethingHof(callback) {
+  callback("Hello something");
+}
+function showSomethingCallback(msg) {
+  console.log(msg);
+}
+showSomethingHof(showSomethingCallback);
+
+function showSomethingHofMultiply(callback) {
+  return callback(5, 510);
+}
+function multiplyNumbers(a, b) {
+  console.log(a * b);
+}
+showSomethingHofMultiply(multiplyNumbers);
+
+function getUserInputHoF(callback) {
+  let userName = "Saif";
+  callback(userName);
+}
+function welcomeUser(name) {
+  console.log(`Welcome ${name}`);
+}
+getUserInputHoF(welcomeUser);
