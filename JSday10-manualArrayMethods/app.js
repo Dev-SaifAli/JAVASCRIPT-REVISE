@@ -43,6 +43,7 @@ const pushedElement2 = function (arr, element) {
 };
 pushedElement2(arr, 16);
 console.log("Array after second push:", arr);
+
 // High-Order Function for Push
 const pushElement = function (arr, element, callback) {
   callback(arr, element);
@@ -54,3 +55,22 @@ const addElement = function (arr, element) {
 pushElement(arr, "newArray", addElement);
 console.log("\n");
 console.log("Array after HOF Push:", arr);
+
+function manualShift(arr) {
+  if (arr.length === 0) {
+    return undefined;
+  }
+  for (let i = 1; i < arr.length; i++) {
+    arr[i - 1] = arr[i];
+  }
+  arr.length = arr.length - 1;
+}
+manualShift(arr);
+console.log("\n");
+console.log("Array after shift:", arr);
+
+// Manual Unshift
+function manualUnshift(arr, element){
+  
+}
+
