@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer & Storage</title>
+</head>
+
+<body>
+    <button id="clear-interval">Clear Interval</button>
+    <button id="clear-timeout">Clear Timeout</button>
+    <button class="create-session">Create Session</button>
+
+    <h1>The Window Object</h1>
+    <h2>setTimeOut() Method</h2>
+
+    <p>Wait 5 seconds for the greeting:</p>
+    <button onclick="myStopFunction();">Stop!</button>
+    <p>Click "Stop" to prevent myGreeting() to execute. </p>
+
+    <h2 id="demo"></h2>
+    <p>Click the button. Wait 3 seconds for alert "Hello" </p>
+    <button onclick="myFunction();">Try it!</button>
+    <hr>
+    <p>The input field will tell you when two, four and six seconds have passed.</p>
+    <input type="text" id="text">
+    <hr>
+    <button onclick="startCount()">Start count!</button>
+    <input type="text" id="count">
+    <button onclick="stopCount()">Stop count!</button>
+
+    <hr>
+    <hr>
+
+    <h1>Storage and cookies example</h1>
+    <h2>Local storage</h2>
+    <button id="set-local-storage">Set local storage</button>
+    <button id="clear-local-storage">Clear local storage</button>
+    <hr>
+    <h2>Session storage</h2>
+    <button id="set-session-storage">Set Session storage</button>
+    <button id="clear-session-storage">Clear Session storage</button>
+    <hr>
+    <h2>Cookies</h2>
+    <button id="set-cookies">Set Cookies</button>
+    <button id="clear-cookies">Clear Cookies</button>
+
+
+    <script src="app.js"></script>
+</body>
+
+</html>
