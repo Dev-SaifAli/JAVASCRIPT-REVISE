@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            border: none;
+            outline: none;
+            text-decoration: none;
+            color: #111;
+            font-family: cursive
+        }
+
+        input,
+        label,
+        select {
+            width: 100%;
+        }
+
+        input {
+            padding: 1rem 0.4rem;
+        }
+
+        button {
+            background-color: paleturquoise;
+            width: 100%;
+            padding: 0.8rem 0.4rem;
+            font-weight: bolder;
+            font-size: larger;
+            cursor: pointer;
+        }
+
+        main {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #111;
+        }
+
+        main>form {
+            width: 300px;
+            padding: 1rem;
+            border-radius: 0.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            border: 1px solid azure;
+        }
+
+        main>form>div.gender-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        main>form>h2 {
+            text-align: center;
+            color: azure;
+        }
+
+        main>form>div.gender-wrapper>label {
+            color: azure;
+            font-size: larger;
+        }
+
+        main>form>div.gender-wrapper>select {
+            flex-grow: 1;
+            padding: 0.8rem 0.4rem;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <form action="" name="student-details-form">
+            <h2>Enter Student Details</h2>
+            <input type="text" name="name" placeholder="Enter student's name" required autofocus>
+            <input type="number" name="age" placeholder="Enter student's age" required>
+            <input type="date" name="dob" placeholder="Enter student's age" required>
+            <div class="gender-wrapper">
+                <label for="gender">Select gender:</label>
+                <select name="gender" id="gender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <button type="submit">Submit Details</button>
+        </form>
+    </main>
+
+
+    <script>
+        document.forms["student-details-form"].addEventListener("submit", function (event) {
+            event.preventDefault();
+            const name = event.target.name.value;
+            const age = event.target.age.value;
+            const dob = event.target.dob.value;
+            const gender = event.target.name.value;
+            const student = { name, age, dob, gender }
+
+            const previousRecordArray = window.localStorage.getItem("records") ?? JSON.stringify([]);
+            const previousRecordArrayParsed = JSON.parse(previousRecordArray);
+            // debugger;
+            console.log(previousRecordArray, previousRecordArrayParsed);
+            console.log(typeof previousRecordArray, typeof previousRecordArrayParsed);
+            previousRecordArrayParsed.push(student);
+            localStorage.setItem("records", JSON.stringify(previousRecordArrayParsed))
+
+        })
+
+        console.log(undefined && "saif")
+        function foo(bar) {
+            bar = bar ?? 55;
+            console.log(bar);
+        }
+        foo(); // 55 
+        foo(22); // 22
+
+        //   // Nullish coalescing operator
+
+        console.log(undefined || "Raheel");
+        console.log(null || "Raheel");
+        console.log(undefined && "Raheel");
+        console.log(null && "Raheel");
+        console.log(null ?? "Raheel");
+        console.log(undefined ?? "Raheel");
+        console.log("" ?? "Raheel"); console.log(NaN ?? "Raheel");
+        console.log(false ?? "Raheel");
+        console.log(true ?? "Raheel");
+
+        // console.log(null.length);
+        // console.log(undefined.length);
+
+        const data = null ?? [];
+        console.log(data);
+
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>
