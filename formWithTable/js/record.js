@@ -28,8 +28,12 @@ records.forEach(function (element) {
   dltButton.setAttribute("id", "delete");
 
   dltButton.addEventListener("click", function () {
+    console.log("Listener created for", tr);
     const rows = [...tBody.querySelectorAll("tr")];
+    console.log(rows);
+    
     const rowIndex = rows.indexOf(tr);
+    console.log(rowIndex, tr);
     if (rowIndex !== -1) {
       tr.remove();
       records.splice(rowIndex, 1);

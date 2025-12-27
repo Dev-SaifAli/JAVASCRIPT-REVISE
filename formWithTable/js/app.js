@@ -5,6 +5,7 @@ document.forms["student-details-form"].addEventListener("submit", (event) => {
   const dob = event.target.dob.value;
   const gender = event.target.gender.value;
   const student = { name, age, dob, gender };
+  console.log(student);
 
   const previousRecordsArray =
     window.localStorage.getItem("records") ?? JSON.stringify([]);
