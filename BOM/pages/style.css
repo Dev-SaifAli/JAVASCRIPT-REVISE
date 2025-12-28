@@ -1,0 +1,23 @@
+body {
+  text-align: center;
+  background: #f6e58d;
+  font-family: sans-serif;
+  padding: 50px;
+}
+button {
+  padding: 10px 15px;
+  background: #e84118;
+  color: white;
+  border: none;
+  margin: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#output {
+  margin-top: 20px;
+  padding: 10px;
+  background: white;
+  border-radius: 5px;
+  max-width: 500px;
+  margin-inline: auto;
+}
