@@ -91,15 +91,42 @@ function renderTasks() {
   taskList.innerHTML = "";
   tasks.forEach((task) => {
     const li = document.createElement("li");
-    li.textContent = task.title;
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.name = "completed";
+    checkbox.value = task.title;
+
+    const span = document.createElement("span");
+    span.className = "strike";
+    span.textContent = task.title;
 
     const deleteBtn = document.createElement("button");
     deleteBtn.innerText = "Delete";
 
+    checkbox.addEventListener("change", function() {
+      if(this.checked) {
+
+        span.style.textDecoration = "line-through";
+        span.style.color = "#999";
+        task.completed = true;
+        console.log("true");
+      } else {
+        span.style.textDecoration = "none";
+        span.style.color = "#000"
+        task.completed = false;
+        console.log("false");
+      }
+
+      saveTask();
+      console.log(task);
+    });
+
     deleteBtn.addEventListener("click", () => {
       deleteTask(task.id);
     });
-
+    li.appendChild(checkbox);
+    li.appendChild(span);
     li.appendChild(deleteBtn);
     taskList.appendChild(li);
   });
