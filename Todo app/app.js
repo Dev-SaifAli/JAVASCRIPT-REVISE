@@ -95,30 +95,34 @@ function renderTasks() {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.name = "completed";
-    checkbox.value = task.title;
+    // checkbox.value = task.title;
+    checkbox.checked = task.completed;
 
     const span = document.createElement("span");
     span.className = "strike";
     span.textContent = task.title;
+    span.className = task.completed ? "checked" : "";
 
     const deleteBtn = document.createElement("button");
     deleteBtn.innerText = "Delete";
 
-    checkbox.addEventListener("change", function() {
-      if(this.checked) {
+    checkbox.addEventListener("change", function () {
+      // if(this.checked) {
 
-        span.style.textDecoration = "line-through";
-        span.style.color = "#999";
-        task.completed = true;
-        console.log("true");
-      } else {
-        span.style.textDecoration = "none";
-        span.style.color = "#000"
-        task.completed = false;
-        console.log("false");
-      }
+      //   span.style.textDecoration = "line-through";
+      //   span.style.color = "#999";
+      //   task.completed = true;
+      //   console.log("true");
+      // } else {
+      //   span.style.textDecoration = "none";
+      //   span.style.color = "#000"
+      //   task.completed = false;
+      //   console.log("false");
+      // }
+      task.completed = checkbox.checked;
 
       saveTask();
+      renderTasks();
       console.log(task);
     });
 
