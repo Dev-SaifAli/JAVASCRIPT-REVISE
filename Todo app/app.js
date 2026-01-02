@@ -61,7 +61,7 @@ const taskList = document.getElementById("task-list");
 let tasks = loadTasks();
 
 // State & Persistence
-function saveTask() {
+function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 function loadTasks() {
@@ -74,21 +74,24 @@ function addTask(title) {
     title: title,
     completed: false,
   };
-  tasks.push(task); // State Update
-  saveTask(); // Persistence
-  renderTasks(); // Render UI
+  // tasks.push(task); // State Update
+  tasks = [...tasks, task];
+  // saveTask(); // Persistence
+  // renderTasks(); // Render UI
+  updateAndRender();
 }
 
 function deleteTask(taskId) {
   tasks = tasks.filter((task) => task.id !== taskId);
   console.log("tasks", tasks);
-  saveTask();
-  renderTasks();
+  updateAndRender();
 }
 
 function renderTasks() {
   console.log("renderTasks call....");
+
   taskList.innerHTML = "";
+
   tasks.forEach((task) => {
     const li = document.createElement("li");
 
@@ -97,6 +100,7 @@ function renderTasks() {
     checkbox.name = "completed";
     // checkbox.value = task.title;
     checkbox.checked = task.completed;
+    checkbox.dataset.id = task.id;
 
     const span = document.createElement("span");
     span.className = "strike";
@@ -105,35 +109,66 @@ function renderTasks() {
 
     const deleteBtn = document.createElement("button");
     deleteBtn.innerText = "Delete";
+    deleteBtn.dataset.id = task.id;
 
-    checkbox.addEventListener("change", function () {
-      // if(this.checked) {
+    // *Instead of creating event listener again and again for each checkbox & delete element on every render, we use event delegation.⬇
 
-      //   span.style.textDecoration = "line-through";
-      //   span.style.color = "#999";
-      //   task.completed = true;
-      //   console.log("true");
-      // } else {
-      //   span.style.textDecoration = "none";
-      //   span.style.color = "#000"
-      //   task.completed = false;
-      //   console.log("false");
-      // }
-      task.completed = checkbox.checked;
+    // checkbox.addEventListener("change", function () {
+    //   // if(this.checked) {
 
-      saveTask();
-      renderTasks();
-      console.log(task);
-    });
+    //   //   span.style.textDecoration = "line-through";
+    //   //   span.style.color = "#999";
+    //   //   task.completed = true;
+    //   //   console.log("true");
+    //   // } else {
+    //   //   span.style.textDecoration = "none";
+    //   //   span.style.color = "#000"
+    //   //   task.completed = false;
+    //   //   console.log("false");
+    //   // }
+    //   // task.completed = checkbox.checked;
+    //   toggleTask(task.id);
 
-    deleteBtn.addEventListener("click", () => {
-      deleteTask(task.id);
-    });
+    //   // saveTask();
+    //   // renderTasks();
+    //   updateAndRender();
+    // });
+
+    // deleteBtn.addEventListener("click", () => {
+    //   deleteTask(task.id);
+    // });
     li.appendChild(checkbox);
     li.appendChild(span);
     li.appendChild(deleteBtn);
     taskList.appendChild(li);
   });
+}
+// ➡️ Event Delegation
+
+taskList.addEventListener("click", function (e) {
+  const target = e.target;
+
+  // Delete button clicked
+  if (target.tagName === "BUTTON" && target.dataset.id) {
+    deleteTask(Number(target.dataset.id));
+    updateAndRender();
+  }
+
+  if (target.type === "checkbox" && target.dataset.id) {
+    toggleTask(Number(target.dataset.id));
+    updateAndRender();
+  }
+});
+
+function toggleTask(id) {
+  tasks = tasks.map((t) =>
+    t.id === id ? { ...t, completed: !t.completed } : t
+  );
+}
+
+function updateAndRender() {
+  saveTasks();
+  renderTasks();
 }
 
 addTaskBtn.addEventListener("click", () => {
