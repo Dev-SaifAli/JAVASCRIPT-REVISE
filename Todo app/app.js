@@ -75,9 +75,12 @@ function addTask(title) {
     completed: false,
   };
   // tasks.push(task); // State Update
-  tasks = [...tasks, task];
+  const prevTasks = tasks;
+  tasks = [...prevTasks, task];
   // saveTask(); // Persistence
   // renderTasks(); // Render UI
+  console.log("Before:", prevTasks);
+  console.log("After:", tasks);
   updateAndRender();
 }
 
@@ -88,28 +91,37 @@ function deleteTask(taskId) {
 }
 
 function renderTasks() {
-  console.log("renderTasks call....");
+  console.log("renderTasks call();");
 
   taskList.innerHTML = "";
 
   tasks.forEach((task) => {
+    // Destructuring the task object.
+    const { id, title, completed } = task;
+
     const li = document.createElement("li");
 
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.name = "completed";
     // checkbox.value = task.title;
-    checkbox.checked = task.completed;
-    checkbox.dataset.id = task.id;
+    // ⭐ UI depends upon the state 'task.completed'
+    // checkbox.checked = task.completed;
+    // checkbox.dataset.id = task.id;
+    checkbox.checked =  completed;
+    checkbox.dataset.id = id;
+
 
     const span = document.createElement("span");
     span.className = "strike";
-    span.textContent = task.title;
-    span.className = task.completed ? "checked" : "";
+    // span.textContent = task.title;
+    // span.className = task.completed ? "checked" : "";
+    span.textContent = title;
+    span.className = completed ? "checked" : "";
 
     const deleteBtn = document.createElement("button");
     deleteBtn.innerText = "Delete";
-    deleteBtn.dataset.id = task.id;
+    deleteBtn.dataset.id = id;
 
     // *Instead of creating event listener again and again for each checkbox & delete element on every render, we use event delegation.⬇
 
@@ -146,24 +158,31 @@ function renderTasks() {
 // ➡️ Event Delegation
 
 taskList.addEventListener("click", function (e) {
-  const target = e.target;
+  // const target = e.target;
+  const {target} = e;
+  const {id} = target.dataset;
+  console.log(e);
+  console.log(e.currentTarget);
+  console.log(e.target);
 
   // Delete button clicked
-  if (target.tagName === "BUTTON" && target.dataset.id) {
-    deleteTask(Number(target.dataset.id));
+  if (target.tagName === "BUTTON" && id) {
+    deleteTask(Number(id));
     updateAndRender();
   }
 
-  if (target.type === "checkbox" && target.dataset.id) {
-    toggleTask(Number(target.dataset.id));
+  if (target.type === "checkbox" && id) {
+    toggleTask(Number(id));
     updateAndRender();
   }
 });
 
 function toggleTask(id) {
-  tasks = tasks.map((t) =>
-    t.id === id ? { ...t, completed: !t.completed } : t
-  );
+  // tasks = tasks.map((t) =>
+  //   t.id === id ? { ...t, completed: !t.completed } : t
+  // );
+
+  
 }
 
 function updateAndRender() {
@@ -184,3 +203,6 @@ addTaskBtn.addEventListener("click", () => {
 
 // Init
 renderTasks();
+
+console.log(new Date(Date.now())); // readable date.
+console.log(Date.now()); // timestamps.
