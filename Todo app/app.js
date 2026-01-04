@@ -64,25 +64,40 @@ let tasks = loadTasks();
 function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 }
+
 function loadTasks() {
   return JSON.parse(localStorage.getItem("tasks")) || [];
 }
 
-function addTask(title) {
-  let task = {
-    id: Date.now(),
-    title: title,
-    completed: false,
-  };
-  // tasks.push(task); // State Update
-  const prevTasks = tasks;
+function handleAddTask(title) {
+  // Object is passed here...
+  const task = createTask({ title, ...rest }); // title property in that object, destructured here...
+  let prevTasks = tasks;
   tasks = [...prevTasks, task];
-  // saveTask(); // Persistence
-  // renderTasks(); // Render UI
   console.log("Before:", prevTasks);
   console.log("After:", tasks);
   updateAndRender();
 }
+
+function createTask({ title, ...rest }) {
+  console.log("createTask called");
+  return {
+    id: Date.now(),
+    title,
+    completed: false,
+    ...rest,
+  };
+}
+
+// tasks.push(task); // State Update
+// const task = createTask();
+// const prevTasks = tasks;
+// tasks = [...prevTasks, task];
+// saveTask(); // Persistence
+// renderTasks(); // Render UI
+// console.log("Before:", prevTasks);
+// console.log("After:", tasks);
+// updateAndRender();
 
 function deleteTask(taskId) {
   tasks = tasks.filter((task) => task.id !== taskId);
@@ -104,18 +119,21 @@ function renderTasks() {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.name = "completed";
+
     // checkbox.value = task.title;
     // ⭐ UI depends upon the state 'task.completed'
     // checkbox.checked = task.completed;
     // checkbox.dataset.id = task.id;
-    checkbox.checked =  completed;
-    checkbox.dataset.id = id;
 
+    checkbox.checked = completed;
+    checkbox.dataset.id = id;
 
     const span = document.createElement("span");
     span.className = "strike";
+
     // span.textContent = task.title;
     // span.className = task.completed ? "checked" : "";
+
     span.textContent = title;
     span.className = completed ? "checked" : "";
 
@@ -149,18 +167,21 @@ function renderTasks() {
     // deleteBtn.addEventListener("click", () => {
     //   deleteTask(task.id);
     // });
+
     li.appendChild(checkbox);
     li.appendChild(span);
     li.appendChild(deleteBtn);
     taskList.appendChild(li);
   });
 }
+
 // ➡️ Event Delegation
 
 taskList.addEventListener("click", function (e) {
   // const target = e.target;
-  const {target} = e;
-  const {id} = target.dataset;
+
+  const { target } = e;
+  const { id } = target.dataset;
   console.log(e);
   console.log(e.currentTarget);
   console.log(e.target);
@@ -177,12 +198,11 @@ taskList.addEventListener("click", function (e) {
   }
 });
 
-function toggleTask(id) {
-  // tasks = tasks.map((t) =>
-  //   t.id === id ? { ...t, completed: !t.completed } : t
-  // );
-
-  
+function toggleTask(taskId) {
+  tasks = tasks.map((task) => {
+    const { id, completed } = task;
+    return id === taskId ? { ...task, completed: !completed } : task;
+  });
 }
 
 function updateAndRender() {
@@ -191,13 +211,24 @@ function updateAndRender() {
 }
 
 addTaskBtn.addEventListener("click", () => {
-  let title = taskInput.value;
+  let title = taskInput.value.trim();
+
   if (!title) {
     alert("Type something...☺️");
     return;
   }
 
-  addTask(title);
+  // const task = createTask({ title }); // {title: title} => {title}
+  // let prevTasks = tasks;
+  // tasks = [...prevTasks, task];
+
+  // console.log("Before:", prevTasks);
+  // console.log("After:", tasks);
+
+  // updateAndRender();
+
+  handleAddTask(title);
+
   taskInput.value = "";
 });
 
@@ -206,3 +237,18 @@ renderTasks();
 
 console.log(new Date(Date.now())); // readable date.
 console.log(Date.now()); // timestamps.
+
+const numbersOne = [1, 2, 3];
+const numbersTwo = [4, 5, 6];
+const numbersCombined = [...numbersOne, ...numbersTwo]; // Quickly copy all or part of an existing array or object into another array or object.
+console.log(numbersCombined);
+
+function fun({ title, ...rest }) {
+  // allows a function to accept an indefinite number of arguments as an array or object.
+  return {
+    id: Date.now(),
+    title,
+    ...rest,
+  };
+}
+console.log(fun({ title: "Breakfast", priority: "high", completed: false }));
