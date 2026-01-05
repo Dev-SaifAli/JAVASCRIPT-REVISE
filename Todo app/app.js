@@ -1,4 +1,4 @@
-const taskInput = document.getElementById("taskInput");
+const taskInput = document.getElementById("title");
 const addTaskBtn = document.getElementById("addTaskBtn");
 const taskList = document.getElementById("task-list");
 
@@ -57,7 +57,19 @@ const taskList = document.getElementById("task-list");
 // addTaskBtn.addEventListener("click", () => {
 //   saveTask();
 // });
+const todayDate = document.querySelector("#date");
+const today = new Date();
 
+const longDate = today.toLocaleDateString("en-US", {
+  weekday: "long", // Full day name (e.g., Monday)
+  // year: "numeric", // Full year (e.g., 2026)
+  month: "long", // Full month name (e.g., January)
+  day: "numeric", // Day of the month (e.g., 5)
+});
+todayDate.innerText = longDate;
+
+console.log(longDate);
+// Output: Monday, January 5, 2026
 let tasks = loadTasks();
 
 // State & Persistence
@@ -71,7 +83,8 @@ function loadTasks() {
 
 function handleAddTask(title) {
   // Object is passed here...
-  const task = createTask({ title, ...rest }); // title property in that object, destructured here...
+  const task = createTask({ title }); // object in shorthand form is created here:{title: title}
+
   let prevTasks = tasks;
   tasks = [...prevTasks, task];
   console.log("Before:", prevTasks);
@@ -79,13 +92,14 @@ function handleAddTask(title) {
   updateAndRender();
 }
 
-function createTask({ title, ...rest }) {
+function createTask({ title }) {
+  // title property in that object, destructured here... & the remaining arguments are stored as an object.
   console.log("createTask called");
   return {
     id: Date.now(),
     title,
     completed: false,
-    ...rest,
+    // ...rest,
   };
 }
 
@@ -199,10 +213,13 @@ taskList.addEventListener("click", function (e) {
 });
 
 function toggleTask(taskId) {
+  let prevTasks = tasks;
   tasks = tasks.map((task) => {
     const { id, completed } = task;
     return id === taskId ? { ...task, completed: !completed } : task;
   });
+  console.log("Previous:", prevTasks);
+  console.log("toggle:", tasks);
 }
 
 function updateAndRender() {
@@ -252,3 +269,15 @@ function fun({ title, ...rest }) {
   };
 }
 console.log(fun({ title: "Breakfast", priority: "high", completed: false }));
+
+const a = { name: "Task", meta: { done: false } };
+const b = { ...a };
+
+b.meta.done = true;
+
+console.log(a.meta.done); // true ❌
+
+const d = { name: "Task", meta: { done: false } };
+const c = structuredClone(d);
+c.meta.done = true;
+console.log(d.meta.done);
