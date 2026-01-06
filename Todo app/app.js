@@ -1,63 +1,9 @@
-const taskInput = document.getElementById("title");
 const addTaskBtn = document.getElementById("addTaskBtn");
-const taskList = document.getElementById("task-list");
+const tbody = document.getElementById("task-list");
+const todoForm = document.getElementById("todoForm");
+const formModal = document.getElementById("todoModal");
+const headerDate = document.querySelector("#date");
 
-// let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-
-// function saveTask() {
-//   console.log("saveTask...");
-
-//   let task = taskInput.value.trim();
-
-//   if (!task) {
-//     alert("Enter some task to add...");
-//     return;
-//   }
-
-//   tasks.push(task);
-
-//   localStorage.setItem("tasks", JSON.stringify(tasks));
-
-//   console.log("Task is saved in local storage");
-
-//   taskInput.value = "";
-
-//   renderTasks();
-// }
-
-// function renderTasks() {
-//   taskList.innerHTML = "";
-
-//   tasks.forEach((task) => {
-
-//     const li = document.createElement("li");
-//     li.innerText = task;
-
-//     const dltBtn = document.createElement("button");
-//     dltBtn.textContent = "Delete";
-
-//     dltBtn.addEventListener("click", () => {
-//       deleteTask(task);
-//       console.log(task);
-//     });
-
-//     li.appendChild(dltBtn);
-
-//     taskList.appendChild(li);
-//   });
-// }
-
-// function deleteTask(task) {
-//   console.log("deleteTask run!");
-//   tasks = tasks.filter((t) => t !== task);
-//   localStorage.setItem("tasks", JSON.stringify(tasks));
-//   console.log(tasks);
-//   renderTasks();
-// }
-// addTaskBtn.addEventListener("click", () => {
-//   saveTask();
-// });
-const todayDate = document.querySelector("#date");
 const today = new Date();
 
 const longDate = today.toLocaleDateString("en-US", {
@@ -66,10 +12,42 @@ const longDate = today.toLocaleDateString("en-US", {
   month: "long", // Full month name (e.g., January)
   day: "numeric", // Day of the month (e.g., 5)
 });
-todayDate.innerText = longDate;
+headerDate.innerText = longDate;
 
-console.log(longDate);
-// Output: Monday, January 5, 2026
+todoForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const form = e.target;
+
+  const title = form.title.value.trim();
+
+  if (!title) {
+    alert("Please enter the title...");
+    return;
+  }
+
+  const priority = form.priority.value;
+  const category = form.category.value;
+  const dueDate = form.dueDate.value;
+  const notes = form.notes.value.trim();
+
+  const taskData = {
+    title,
+    notes,
+    meta: { priority, category, dueDate },
+  };
+
+  console.log(taskData);
+  addTask(taskData);
+
+  form.reset();
+
+  const modalInstance = bootstrap.Modal.getInstance(formModal);
+  if (modalInstance) {
+    modalInstance.hide();
+  }
+});
+
 let tasks = loadTasks();
 
 // State & Persistence
@@ -81,37 +59,27 @@ function loadTasks() {
   return JSON.parse(localStorage.getItem("tasks")) || [];
 }
 
-function handleAddTask(title) {
+function addTask(taskData) {
   // Object is passed here...
-  const task = createTask({ title }); // object in shorthand form is created here:{title: title}
+  const task = createTask(taskData); // object in shorthand form is created here:{title: title}
 
-  let prevTasks = tasks;
-  tasks = [...prevTasks, task];
-  console.log("Before:", prevTasks);
+  console.log("Before:", tasks);
+  tasks = [...tasks, task];
   console.log("After:", tasks);
   updateAndRender();
 }
 
-function createTask({ title }) {
-  // title property in that object, destructured here... & the remaining arguments are stored as an object.
-  console.log("createTask called");
+function createTask({ title, notes = "", meta = {} }) {
+  alert("saved to local storage.");
   return {
     id: Date.now(),
     title,
+    notes,
     completed: false,
-    // ...rest,
+    createdAt: Date.now(),
+    meta,
   };
 }
-
-// tasks.push(task); // State Update
-// const task = createTask();
-// const prevTasks = tasks;
-// tasks = [...prevTasks, task];
-// saveTask(); // Persistence
-// renderTasks(); // Render UI
-// console.log("Before:", prevTasks);
-// console.log("After:", tasks);
-// updateAndRender();
 
 function deleteTask(taskId) {
   tasks = tasks.filter((task) => task.id !== taskId);
@@ -122,76 +90,71 @@ function deleteTask(taskId) {
 function renderTasks() {
   console.log("renderTasks call();");
 
-  taskList.innerHTML = "";
+  tbody.innerHTML = "";
 
   tasks.forEach((task) => {
     // Destructuring the task object.
-    const { id, title, completed } = task;
 
-    const li = document.createElement("li");
+    const {
+      id,
+      title,
+      notes,
+      completed,
+      createdAt,
+      meta: { priority = "normal", category = "general", dueDate = "-" } = {},
+    } = task;
 
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.name = "completed";
+    const tr = document.createElement("tr");
 
-    // checkbox.value = task.title;
-    // ⭐ UI depends upon the state 'task.completed'
-    // checkbox.checked = task.completed;
-    // checkbox.dataset.id = task.id;
+    // const checkbox = document.createElement("input");
+    // checkbox.type = "checkbox";
+    // checkbox.name = "completed";
+    // checkbox.checked = completed;
+    // checkbox.dataset.id = id;
 
-    checkbox.checked = completed;
-    checkbox.dataset.id = id;
-
-    const span = document.createElement("span");
-    span.className = "strike";
-
-    // span.textContent = task.title;
-    // span.className = task.completed ? "checked" : "";
-
-    span.textContent = title;
-    span.className = completed ? "checked" : "";
+    function formatDate(ts) {
+      const d = new Date(ts);
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
 
     const deleteBtn = document.createElement("button");
-    deleteBtn.innerText = "Delete";
+    deleteBtn.innerHTML = "<span class='text-danger'>Delete</span>";
     deleteBtn.dataset.id = id;
 
-    // *Instead of creating event listener again and again for each checkbox & delete element on every render, we use event delegation.⬇
+    const editBtn = document.createElement("button");
+    editBtn.innerHTML = "<span class='text-secondary'>Edit</span>";
+    editBtn.dataset.id = id;
 
-    // checkbox.addEventListener("change", function () {
-    //   // if(this.checked) {
+    const td = document.createElement("td");
 
-    //   //   span.style.textDecoration = "line-through";
-    //   //   span.style.color = "#999";
-    //   //   task.completed = true;
-    //   //   console.log("true");
-    //   // } else {
-    //   //   span.style.textDecoration = "none";
-    //   //   span.style.color = "#000"
-    //   //   task.completed = false;
-    //   //   console.log("false");
-    //   // }
-    //   // task.completed = checkbox.checked;
-    //   toggleTask(task.id);
+    tr.innerHTML = `<td>${id}</td>
+     <td>${title}</td>
+     <td>${notes}</td>
+     <td>${completed ? "✅" : "❌"}</td>
+     <td>${formatDate(task.createdAt)}</td>
+     <td>${priority}</td>
+     <td>${category}</td>
+     <td>${dueDate}</td>
+                   `;
+    td.appendChild(deleteBtn);
+    td.appendChild(editBtn);
+    tr.appendChild(td);
+    tbody.appendChild(tr);
 
-    //   // saveTask();
-    //   // renderTasks();
-    //   updateAndRender();
-    // });
+    const defaultText = document.getElementById("defaultText");
+    const taskCount = tbody.querySelectorAll("tr:not(#defaultText)").length;
 
-    // deleteBtn.addEventListener("click", () => {
-    //   deleteTask(task.id);
-    // });
-
-    li.appendChild(checkbox);
-    li.appendChild(span);
-    li.appendChild(deleteBtn);
-    taskList.appendChild(li);
+    defaultText.style.display =
+      taskCount.childElementCount > 0 ? "none" : "table-row";
   });
 }
 
 // ➡️ Event Delegation
 
-taskList.addEventListener("click", function (e) {
+tbody.addEventListener("click", function (e) {
   // const target = e.target;
 
   const { target } = e;
@@ -202,6 +165,7 @@ taskList.addEventListener("click", function (e) {
 
   // Delete button clicked
   if (target.tagName === "BUTTON" && id) {
+    console.log(id);
     deleteTask(Number(id));
     updateAndRender();
   }
@@ -227,27 +191,27 @@ function updateAndRender() {
   renderTasks();
 }
 
-addTaskBtn.addEventListener("click", () => {
-  let title = taskInput.value.trim();
+// addTaskBtn.addEventListener("click", () => {
+//   let title = title.value.trim();
 
-  if (!title) {
-    alert("Type something...☺️");
-    return;
-  }
+//   if (!title) {
+//     alert("Type something...☺️");
+//     return;
+//   }
 
-  // const task = createTask({ title }); // {title: title} => {title}
-  // let prevTasks = tasks;
-  // tasks = [...prevTasks, task];
+//   // const task = createTask({ title }); // {title: title} => {title}
+//   // let prevTasks = tasks;
+//   // tasks = [...prevTasks, task];
 
-  // console.log("Before:", prevTasks);
-  // console.log("After:", tasks);
+//   // console.log("Before:", prevTasks);
+//   // console.log("After:", tasks);
 
-  // updateAndRender();
+//   // updateAndRender();
 
-  handleAddTask(title);
+//   handleAddTask(title);
 
-  taskInput.value = "";
-});
+//   title.value = "";
+// });
 
 // Init
 renderTasks();
@@ -278,6 +242,8 @@ b.meta.done = true;
 console.log(a.meta.done); // true ❌
 
 const d = { name: "Task", meta: { done: false } };
+const { name, meta } = d;
+console.log(name, meta);
 const c = structuredClone(d);
 c.meta.done = true;
 console.log(d.meta.done);

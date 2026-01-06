@@ -13,7 +13,7 @@ body {
   width: 100%;
   height: 100%;
   background-color: #222222 !important;
-  padding: 1rem;
+  padding: 1rem 1rem 0;
   color: aliceblue !important;
 }
 
@@ -24,7 +24,9 @@ body {
   background-image: url(bg-img.jpg);
   background-size: cover;
   background-repeat: no-repeat;
-  border-radius: 6px;
+  /* border-radius: 6px;
+  border-bottom: 0px; */
+  border: 6px 6px 0px;
   font-family: "Plus Jakarta Sans";
   padding: 1rem 2rem;
   /* display: flex;
@@ -42,32 +44,39 @@ body {
   backdrop-filter: blur(1px);
   /* border: 1px solid rgba(255, 255, 255, 0.3); */
   padding: 1rem;
-  display: flex;
-  justify-content: space-between;
+  display: flex column;
+
+  align-items: center;
   h1 {
     font-size: 1.6rem;
   }
   p {
     font-size: 1rem;
+    color: #efeeee;
   }
 }
-.defaultText {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
-  aspect-ratio: 3/1.5;
+
+#defaultText td {
+  padding: 5rem 0;
+  text-align: center;
   background: rgba(2, 33, 1, 0.32);
-  border-radius: 6px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   -webkit-backdrop-filter: blur(10.9px);
   backdrop-filter: blur(10.9px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.defaultText {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  h4 {
+    font-size: 2.5rem;
+  }
+  p {
+    font-size: 1rem;
+    font-weight: 200;
+    margin: 0px !important;
+  }
 }
 .fa-calendar {
   font-size: 2rem;
@@ -77,17 +86,10 @@ body {
   text-align: center;
   line-height: 1.5;
 }
-h4 {
-  font-size: 1.25rem;
-}
-p {
-  font-size: 14px;
-  font-weight: 200;
-  margin: 0px !important;
-}
+
 .addBtn {
   position: absolute;
-  top: 70%;
+  top: 90%;
   left: 50%;
   transform: translate(-50%, -70%);
   background-color: #ffd500cd;
