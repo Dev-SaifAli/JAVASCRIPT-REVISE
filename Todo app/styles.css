@@ -64,6 +64,7 @@ body {
   -webkit-backdrop-filter: blur(10.9px);
   backdrop-filter: blur(10.9px);
 }
+
 .defaultText {
   display: inline-flex;
   flex-direction: column;

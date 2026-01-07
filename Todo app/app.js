@@ -66,7 +66,8 @@ function addTask(taskData) {
   console.log("Before:", tasks);
   tasks = [...tasks, task];
   console.log("After:", tasks);
-  updateAndRender();
+  saveTasks();
+  renderTasks(tasks);
 }
 
 function createTask({ title, notes = "", meta = {} }) {
@@ -84,71 +85,121 @@ function createTask({ title, notes = "", meta = {} }) {
 function deleteTask(taskId) {
   tasks = tasks.filter((task) => task.id !== taskId);
   console.log("tasks", tasks);
-  updateAndRender();
+  saveTasks();
+  renderTasks(tasks);
 }
 
-function renderTasks() {
+function renderTasks(tasks) {
   console.log("renderTasks call();");
 
   tbody.innerHTML = "";
+  if (tasks.length === 0) {
+    tbody.innerHTML = `<tr id="defaultText">
+                        <td colspan='100%'>
+                            <div class="defaultText">
+                                <i class="fa-solid fa-calendar " style="color: #ffd500;"></i>
+                                <div class="content">
+                                    <h4>Focus on your day</h4>
+                                    <p>Get things done with My Day, a list <br> that refreshes every day</p>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>`;
+
+    return;
+  }
+
+  // tasks.forEach((task) => {
+
+  //   // Destructuring the task object.
+
+  //   const {
+  //     id,
+  //     title,
+  //     notes,
+  //     completed,
+  //     createdAt,
+  //     meta: { priority = "normal", category = "general", dueDate = "-" } = {},
+  //   } = task;
+
+  //   const tr = document.createElement("tr");
+
+  //   function formatDate(ts) {
+  //     const d = new Date(ts);
+  //     const yyyy = d.getFullYear();
+  //     const mm = String(d.getMonth() + 1).padStart(2, "0");
+  //     const dd = String(d.getDate()).padStart(2, "0");
+  //     return `${yyyy}-${mm}-${dd}`;
+  //   }
+
+  //   const checkbox = document.createElement("input");
+  //   checkbox.type = "checkbox";
+  //   checkbox.name = "completed";
+  //   checkbox.checked = completed;
+  //   checkbox.dataset.id = id;
+
+  //   const deleteBtn = document.createElement("button");
+  //   deleteBtn.innerHTML = "<span class='text-danger'>Delete</span>";
+  //   deleteBtn.dataset.id = id;
+
+  //   const editBtn = document.createElement("button");
+  //   editBtn.innerHTML = "<span class='text-secondary'>Edit</span>";
+  //   editBtn.dataset.id = id;
+
+  //   const td = document.createElement("td");
+  //   td.appendChild(checkbox);
+  //   tr.innerHTML = `<td>${id}</td>
+  //    <td>${title}</td>
+  //    <td>${notes}</td>
+  //    <td>${completed ? "✅" : "❌"}</td>
+  //    <td>${formatDate(task.createdAt)}</td>
+  //    <td>${priority}</td>
+  //    <td>${category}</td>
+  //    <td>${dueDate}</td>
+  //                  `;
+  //   td.appendChild(deleteBtn);
+  //   td.appendChild(editBtn);
+  //   tr.appendChild(td);
+  //   tbody.appendChild(tr);
+  // });
 
   tasks.forEach((task) => {
-    // Destructuring the task object.
-
+    const { id, title, notes, completed, createdAt, meta } = task;
     const {
-      id,
-      title,
-      notes,
-      completed,
-      createdAt,
-      meta: { priority = "normal", category = "general", dueDate = "-" } = {},
-    } = task;
+      priority = "normal",
+      category = "general",
+      dueDate = "-",
+    } = meta || {};
 
     const tr = document.createElement("tr");
+    // Industry Tip: Set a data-id on the row for easy lookup
+    tr.dataset.id = id;
+    if (completed) tr.classList.add("table-active");
 
-    // const checkbox = document.createElement("input");
-    // checkbox.type = "checkbox";
-    // checkbox.name = "completed";
-    // checkbox.checked = completed;
-    // checkbox.dataset.id = id;
+    // Format date once outside the loop if possible, or as a helper
+    const formattedDate = new Date(createdAt).toISOString().split("T")[0];
 
-    function formatDate(ts) {
-      const d = new Date(ts);
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, "0");
-      const dd = String(d.getDate()).padStart(2, "0");
-      return `${yyyy}-${mm}-${dd}`;
-    }
+    tr.innerHTML = `
+    <td>
+      <input type="checkbox" class="task-check" data-id="${id}" ${
+      completed ? "checked" : ""
+    }>
+    </td>
+    <td>${id}</td>
+    <td class="task-title">${title}</td>
+    <td>${notes}</td>
+    <td>${completed ? "✅" : "❌"}</td>
+    <td>${formattedDate}</td>
+    <td><span class="badge priority-${priority}">${priority}</span></td>
+    <td>${category}</td>
+    <td>${dueDate}</td>
+    <td>
+      <button class="btn-delete" data-id="${id}">Delete</button>
+      <button class="btn-edit" data-id="${id}">Edit</button>
+    </td>
+  `;
 
-    const deleteBtn = document.createElement("button");
-    deleteBtn.innerHTML = "<span class='text-danger'>Delete</span>";
-    deleteBtn.dataset.id = id;
-
-    const editBtn = document.createElement("button");
-    editBtn.innerHTML = "<span class='text-secondary'>Edit</span>";
-    editBtn.dataset.id = id;
-
-    const td = document.createElement("td");
-
-    tr.innerHTML = `<td>${id}</td>
-     <td>${title}</td>
-     <td>${notes}</td>
-     <td>${completed ? "✅" : "❌"}</td>
-     <td>${formatDate(task.createdAt)}</td>
-     <td>${priority}</td>
-     <td>${category}</td>
-     <td>${dueDate}</td>
-                   `;
-    td.appendChild(deleteBtn);
-    td.appendChild(editBtn);
-    tr.appendChild(td);
     tbody.appendChild(tr);
-
-    const defaultText = document.getElementById("defaultText");
-    const taskCount = tbody.querySelectorAll("tr:not(#defaultText)").length;
-
-    defaultText.style.display =
-      taskCount.childElementCount > 0 ? "none" : "table-row";
   });
 }
 
@@ -167,12 +218,14 @@ tbody.addEventListener("click", function (e) {
   if (target.tagName === "BUTTON" && id) {
     console.log(id);
     deleteTask(Number(id));
-    updateAndRender();
+    saveTasks();
+    renderTasks();
   }
 
   if (target.type === "checkbox" && id) {
     toggleTask(Number(id));
-    updateAndRender();
+    saveTasks();
+    renderTasks();
   }
 });
 
@@ -186,64 +239,37 @@ function toggleTask(taskId) {
   console.log("toggle:", tasks);
 }
 
-function updateAndRender() {
-  saveTasks();
-  renderTasks();
-}
-
-// addTaskBtn.addEventListener("click", () => {
-//   let title = title.value.trim();
-
-//   if (!title) {
-//     alert("Type something...☺️");
-//     return;
-//   }
-
-//   // const task = createTask({ title }); // {title: title} => {title}
-//   // let prevTasks = tasks;
-//   // tasks = [...prevTasks, task];
-
-//   // console.log("Before:", prevTasks);
-//   // console.log("After:", tasks);
-
-//   // updateAndRender();
-
-//   handleAddTask(title);
-
-//   title.value = "";
-// });
-
 // Init
-renderTasks();
+renderTasks(tasks);
 
-console.log(new Date(Date.now())); // readable date.
-console.log(Date.now()); // timestamps.
+// console.log(new Date(Date.now())); // readable date.
+// console.log(Date.now()); // timestamps.
 
-const numbersOne = [1, 2, 3];
-const numbersTwo = [4, 5, 6];
-const numbersCombined = [...numbersOne, ...numbersTwo]; // Quickly copy all or part of an existing array or object into another array or object.
-console.log(numbersCombined);
+// const numbersOne = [1, 2, 3];
+// const numbersTwo = [4, 5, 6];
+// const numbersCombined = [...numbersOne, ...numbersTwo]; // Quickly copy all or part of an existing array or object into another array or object.
+// console.log(numbersCombined);
 
-function fun({ title, ...rest }) {
-  // allows a function to accept an indefinite number of arguments as an array or object.
-  return {
-    id: Date.now(),
-    title,
-    ...rest,
-  };
-}
-console.log(fun({ title: "Breakfast", priority: "high", completed: false }));
+// function fun({ title, ...rest }) {
+//   // allows a function to accept an indefinite number of arguments as an array or object.
+//   return {
+//     id: Date.now(),
+//     title,
+//     ...rest,
+//   };
+// }
+// console.log(fun({ title: "Breakfast", priority: "high", completed: false }));
 
-const a = { name: "Task", meta: { done: false } };
-const b = { ...a };
+// const a = { name: "Task", meta: { done: false } };
+// const b = { ...a };
 
-b.meta.done = true;
+// b.meta.done = true;
 
-console.log(a.meta.done); // true ❌
+// console.log(a.meta.done); // true ❌
 
-const d = { name: "Task", meta: { done: false } };
-const { name, meta } = d;
-console.log(name, meta);
-const c = structuredClone(d);
-c.meta.done = true;
-console.log(d.meta.done);
+// const d = { name: "Task", meta: { done: false } };
+// const { name, meta } = d;
+// console.log(name, meta);
+// const c = structuredClone(d);
+// c.meta.done = true;
+// console.log(d.meta.done);
