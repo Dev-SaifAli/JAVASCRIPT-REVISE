@@ -215,17 +215,17 @@ tbody.addEventListener("click", function (e) {
   console.log(e.target);
 
   // Delete button clicked
-  if (target.tagName === "BUTTON" && id) {
+  if (target.className === "btn-delete" && id) {
     console.log(id);
     deleteTask(Number(id));
-    saveTasks();
-    renderTasks();
+    // saveTasks();
+    // renderTasks(tasks);
   }
 
   if (target.type === "checkbox" && id) {
     toggleTask(Number(id));
     saveTasks();
-    renderTasks();
+    renderTasks(tasks);
   }
 });
 
