@@ -231,6 +231,7 @@ tbody.addEventListener("click", function (e) {
 
 function toggleTask(taskId) {
   let prevTasks = tasks;
+  
   tasks = tasks.map((task) => {
     const { id, completed } = task;
     return id === taskId ? { ...task, completed: !completed } : task;
