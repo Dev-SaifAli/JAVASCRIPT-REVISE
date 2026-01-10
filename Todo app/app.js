@@ -82,11 +82,53 @@ function createTask({ title, notes = "", meta = {} }) {
   };
 }
 
+function createUndoManager() {
+  let lastDeletedTask = null;
+  let lastIndex = null;
+
+  return {
+    save(task, index) {
+      lastDeletedTask = task;
+      lastIndex = index;
+    },
+
+    undo() {
+      if (!lastDeletedTask) return null;
+
+      const data = { task: lastDeletedTask, index: lastIndex };
+
+      lastDeletedTask = null;
+      lastIndex = null;
+
+      return data;
+    },
+  };
+}
+
+const undoManager = createUndoManager(); // returns an object having save() and undo() methods
+
 function deleteTask(taskId) {
-  tasks = tasks.filter((task) => task.id !== taskId);
-  console.log("tasks", tasks);
+  // Execute the function for each array element.
+  // Returns the index of 1st element that passes the condition;
+
+  const index = tasks.findIndex((t) => t.id === taskId);
+  if (index === -1) return;
+
+  // Modifies the original array and deleted the taskObject present at that index. Returns the array with the deleted taskObject.
+
+  // Destructuring; and store the value of the 1st element into a deletedTask variable.
+
+  const [deletedTask] = tasks.splice(index, 1);
+
+  undoManager.save(deleteTask, index);
+
   saveTasks();
-  renderTasks(tasks);
+  renderTasks();
+
+  // tasks = tasks.filter((task) => task.id !== taskId);
+  // console.log("tasks", tasks);
+  // saveTasks();
+  // renderTasks(tasks);
 }
 
 function renderTasks(tasks) {
@@ -231,7 +273,7 @@ tbody.addEventListener("click", function (e) {
 
 function toggleTask(taskId) {
   let prevTasks = tasks;
-  
+
   tasks = tasks.map((task) => {
     const { id, completed } = task;
     return id === taskId ? { ...task, completed: !completed } : task;
@@ -274,3 +316,54 @@ renderTasks(tasks);
 // const c = structuredClone(d);
 // c.meta.done = true;
 // console.log(d.meta.done);
+
+function outer() {
+  let x = 10;
+
+  function inner() {
+    console.log(x);
+  }
+
+  return inner;
+}
+const fn = outer();
+fn();
+
+function test() {
+  let n = 0;
+
+  return function () {
+    n++;
+    console.log(n);
+  };
+}
+const t = test();
+t();
+t();
+t();
+
+function createCounter() {
+  let count = 0; // private variable
+
+  return {
+    increment() {
+      count++;
+      return count;
+    },
+    decrement() {
+      count--;
+      return count;
+    },
+    reset() {
+      count = 0;
+      return count;
+    },
+  };
+}
+
+const counter = createCounter();
+console.log(counter);
+console.log(counter.increment()); // 1
+console.log(counter.increment()); // 2
+console.log(counter.decrement()); // 1
+console.log(counter.reset()); // 0
