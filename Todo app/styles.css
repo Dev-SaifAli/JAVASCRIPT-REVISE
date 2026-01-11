@@ -88,11 +88,25 @@ body {
   line-height: 1.5;
 }
 
-.addBtn {
+.task-actions {
   position: absolute;
   top: 90%;
   left: 50%;
   transform: translate(-50%, -70%);
+  padding: 8px 16px;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  font-family: "Plus Jakarta Sans";
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.addBtn {
   background-color: #ffd500cd;
   padding: 8px 16px;
   font-size: 1.2rem;
@@ -109,6 +123,22 @@ body {
   &:active {
     outline: 2px dashed aliceblue;
     outline-offset: 2px;
+  }
+}
+
+#undoBtn {
+  background-color: #b1b1b1cd;
+  padding: 8px 16px;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  font-family: "Plus Jakarta Sans";
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  &:disabled {
+    cursor: not-allowed;
   }
 }
 #date {
@@ -145,4 +175,3 @@ input[type="text"] {
   font-size: 1.25rem;
   color: aliceblue;
 }
-
