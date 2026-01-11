@@ -1,4 +1,5 @@
 const undoBtn = document.getElementById("undoBtn");
+const addBtn = document.querySelector(".addBtn");
 const tbody = document.getElementById("task-list");
 const todoForm = document.getElementById("todoForm");
 const formModal = document.getElementById("todoModal");
@@ -59,19 +60,40 @@ function loadTasks() {
   return JSON.parse(localStorage.getItem("tasks")) || [];
 }
 
-function addTask(taskData) {
+async function addTask(taskData) {
   // Object is passed here...
-  const task = createTask(taskData); // object in shorthand form is created here:{title: title}
+
+  showLoading();
+
+  const task = await fakeCreateTask(taskData); // object in shorthand form is created here:{title: title}
 
   console.log("Before:", tasks);
   tasks = [...tasks, task];
   console.log("After:", tasks);
+
   saveTasks();
   renderTasks(tasks);
+
+  hideLoading();
+}
+function fakeCreateTask(taskData) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(createTask(taskData));
+    }, 5000);
+  });
+}
+
+function showLoading() {
+  addBtn.disabled = true;
+  addBtn.innerText = "Saving...";
+}
+function hideLoading() {
+  addBtn.disabled = false;
+  addBtn.innerText = "Add Task";
 }
 
 function createTask({ title, notes = "", meta = {} }) {
-  alert("saved to local storage.");
   return {
     id: Date.now(),
     title,
@@ -120,6 +142,7 @@ function deleteTask(taskId) {
 
   const [deletedTask] = tasks.splice(index, 1);
   console.log(tasks);
+
   undoManager.save(deletedTask, index);
 
   undoBtn.disabled = false;
@@ -281,7 +304,7 @@ tbody.addEventListener("click", function (e) {
   }
 
   if (target.type === "checkbox" && id) {
-    toggleTask(Number(id));
+    toggleTask(Number(id)); 
     saveTasks();
     renderTasks(tasks);
   }
@@ -383,3 +406,43 @@ console.log(counter.increment()); // 1
 console.log(counter.increment()); // 2
 console.log(counter.decrement()); // 1
 console.log(counter.reset()); // 0
+
+const promise = new Promise((resolve, reject) => {
+  let string1 = "FocusOnProgress";
+  let string2 = "FocusOnProgress";
+  if (string1 === string2) {
+    resolve();
+  } else {
+    reject();
+  }
+});
+promise
+  .then(() => {
+    console.log("Promise resolved successfully.");
+  })
+  .catch(() => {
+    console.log("Promise is rejected");
+  });
+
+const helperPromise = function () {
+  const promise = new Promise((resolve, reject) => {
+    let string1 = "FocusOnProgress";
+    let string2 = "FocusOnProress";
+    if (string1 === string2) {
+      resolve("Mission Successfull!.");
+    } else {
+      reject("Mission Failed!");
+    }
+  });
+
+  return promise;
+};
+async function demoPromise() {
+  try {
+    let message = await helperPromise();
+    console.log(message);
+  } catch (error) {
+    console.log("Error: " + error);
+  }
+}
+demoPromise();
