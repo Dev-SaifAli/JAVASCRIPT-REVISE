@@ -1,4 +1,4 @@
-const addTaskBtn = document.getElementById("addTaskBtn");
+const undoBtn = document.getElementById("undoBtn");
 const tbody = document.getElementById("task-list");
 const todoForm = document.getElementById("todoForm");
 const formModal = document.getElementById("todoModal");
@@ -119,17 +119,33 @@ function deleteTask(taskId) {
   // Destructuring; and store the value of the 1st element into a deletedTask variable.
 
   const [deletedTask] = tasks.splice(index, 1);
+  console.log(tasks);
+  undoManager.save(deletedTask, index);
 
-  undoManager.save(deleteTask, index);
-
+  undoBtn.disabled = false;
   saveTasks();
-  renderTasks();
+  renderTasks(tasks);
 
   // tasks = tasks.filter((task) => task.id !== taskId);
   // console.log("tasks", tasks);
   // saveTasks();
   // renderTasks(tasks);
 }
+
+undoBtn.addEventListener("click", () => {
+  const data = undoManager.undo();
+  if (!data) return;
+
+  tasks = [
+    ...tasks.slice(0, data.index),
+    data.task,
+    ...tasks.slice(data.index),
+  ];
+
+  undoBtn.disabled = true;
+  saveTasks();
+  renderTasks(tasks);
+});
 
 function renderTasks(tasks) {
   console.log("renderTasks call();");
