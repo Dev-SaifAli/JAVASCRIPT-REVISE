@@ -27,6 +27,11 @@ todoForm.addEventListener("submit", (e) => {
     return;
   }
 
+  if (isDuplicateTitle(title)) {
+    alert("Task already exists");
+    return;
+  }
+
   const priority = form.priority.value;
   const category = form.category.value;
   const dueDate = form.dueDate.value;
@@ -60,12 +65,24 @@ function loadTasks() {
   return JSON.parse(localStorage.getItem("tasks")) || [];
 }
 
+function getTitlesSet(tasks) {
+  // First, array method map transforms the tasks array and returns an array of titles from each task object in 'lowercase'.
+  // Then, Set converts that array into an object of unique values.
+
+  return new Set(tasks.map((t) => t.title.toLowerCase()));
+}
+
+function isDuplicateTitle(title) {
+  const titles = getTitlesSet(tasks);
+  return titles.has(title.toLowerCase());
+}
+
 async function addTask(taskData) {
   // Object is passed here...
 
   showLoading();
 
-  const task = await fakeCreateTask(taskData); // object in shorthand form is created here:{title: title}
+  const task = await fakeCreateTask(taskData);
 
   console.log("Before:", tasks);
   tasks = [...tasks, task];
@@ -80,7 +97,7 @@ function fakeCreateTask(taskData) {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(createTask(taskData));
-    }, 5000);
+    }, 1000);
   });
 }
 
@@ -304,7 +321,7 @@ tbody.addEventListener("click", function (e) {
   }
 
   if (target.type === "checkbox" && id) {
-    toggleTask(Number(id)); 
+    toggleTask(Number(id));
     saveTasks();
     renderTasks(tasks);
   }
@@ -446,3 +463,25 @@ async function demoPromise() {
   }
 }
 demoPromise();
+
+const set = new Set([1, 2, 3, 4, 5]);
+set.add(3);
+console.log(set);
+console.log(typeof set);
+console.log(set.size);
+console.log(set.has(5));
+set.forEach((value) => console.log(value));
+console.log(set.values());
+console.log(set.keys());
+console.log(set.entries());
+
+const map = new Map();
+map.set("apples", 500);
+map.set("bananas", 200);
+map.set("oranges", 300);
+map.set("apples", 250);
+
+console.log(map);
+console.log(typeof map);
+console.log(map.get("apples"));
+console.log(map.keys());
