@@ -4,6 +4,7 @@ const tbody = document.getElementById("task-list");
 const todoForm = document.getElementById("todoForm");
 const formModal = document.getElementById("todoModal");
 const headerDate = document.querySelector("#date");
+const searchInput = document.querySelector("#searchInput");
 
 const today = new Date();
 
@@ -65,16 +66,18 @@ function loadTasks() {
   return JSON.parse(localStorage.getItem("tasks")) || [];
 }
 
-function getTitlesSet(tasks) {
-  // First, array method map transforms the tasks array and returns an array of titles from each task object in 'lowercase'.
-  // Then, Set converts that array into an object of unique values.
+const titlesSet = new Set();
 
-  return new Set(tasks.map((t) => t.title.toLowerCase()));
-}
+// function getTitlesSet(tasks) {
+//   // First, map array method  transforms the tasks array and returns an array of 'titles' from each task object in 'lowercase'.
+//   // Then, Set converts that array into an object of unique values.
+
+//   return new Set(tasks.map((t) => t.title.toLowerCase()));
+// }
 
 function isDuplicateTitle(title) {
-  const titles = getTitlesSet(tasks);
-  return titles.has(title.toLowerCase());
+  // const titles = getTitlesSet(tasks);
+  return titlesSet.has(title.toLowerCase());
 }
 
 async function addTask(taskData) {
@@ -83,6 +86,7 @@ async function addTask(taskData) {
   showLoading();
 
   const task = await fakeCreateTask(taskData);
+  titlesSet.add(task.title.toLowerCase());
 
   console.log("Before:", tasks);
   tasks = [...tasks, task];
@@ -186,6 +190,34 @@ undoBtn.addEventListener("click", () => {
   saveTasks();
   renderTasks(tasks);
 });
+
+function debounce(fn, delay) {
+  let timer;
+
+  return function (...args) {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+    }, delay);
+
+    console.log(timer);
+  };
+}
+
+function searchTasks(query) {
+  const q = query.trim().toLowerCase();
+  const filtered = tasks.filter((t) => t.title.toLowerCase().includes(q));
+  console.log(filtered);
+
+  renderTasks(filtered);
+}
+
+const debouncedSearch = debounce((e) => {
+  searchTasks(e.target.value);
+}, 1000);
+
+searchInput.addEventListener("input", debouncedSearch);
 
 function renderTasks(tasks) {
   console.log("renderTasks call();");
@@ -502,3 +534,7 @@ console.log(map);
 console.log(typeof map);
 console.log(map.get("apples"));
 console.log(map.keys());
+
+function check(e) {
+  console.log(e.target.value);
+}
