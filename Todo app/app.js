@@ -375,12 +375,12 @@ function toggleTask(taskId) {
   const map = new Map(tasks.map((t) => [t.id, t]));
 
   // 2. Get the required task by id
-  const task = map.get(id);
+  const task = map.get(taskId);
   if (!task) return;
 
   // 3. Update the task : flip completed true/false
 
-  map.set(id, { ...task, completed: !task.completed });
+  map.set(taskId, { ...task, completed: !task.completed });
   tasks = Array.from(map.values());
   console.log("toggle:", tasks);
   saveTasks();
@@ -493,7 +493,7 @@ promise
 const helperPromise = function () {
   const promise = new Promise((resolve, reject) => {
     let string1 = "FocusOnProgress";
-    let string2 = "FocusOnProress";
+    let string2 = "FocusOnProgress";
     if (string1 === string2) {
       resolve("Mission Successfull!.");
     } else {
@@ -538,3 +538,26 @@ console.log(map.keys());
 function check(e) {
   console.log(e.target.value);
 }
+
+let func = function (...args) {
+  return console.log(...args);
+};
+
+func("e");
+
+function throttle(fn, limit) {
+  let inThrottle;
+
+  return function (...args) {
+    if (!inThrottle) {
+      fn.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+}
+const throttledScroll = throttle(() => {
+  console.log("Scroll event handled!");
+}, 1000);
+
+window.addEventListener("scroll", throttledScroll);
