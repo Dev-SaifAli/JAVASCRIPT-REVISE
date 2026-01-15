@@ -9,7 +9,7 @@ function debounce(fn, delay) {
 function logSearch(query) {
   console.log("Searching for: ", query, "at ", new Date().toLocaleTimeString());
 }
-const debouncedSearch = debounce(logSearch, 1000);
+const debouncedSearch = debounce((e) => logSearch(e.target.value), 1000);
 
 // debouncedSearch("H");
 
@@ -42,3 +42,45 @@ const debouncedTyping = debounceLeading(logTyping, 2000);
 // setTimeout(() => debouncedTyping("Hel"), 3000);
 // setTimeout(() => debouncedTyping("Hell"), 5500);
 // setTimeout(() => debouncedTyping("Hello"), 6500);
+
+// LEADING THROTTLE
+function throttle(fn, delay) {
+  let lastTime = 0;
+  console.log(lastTime);
+  return (...args) => {
+    const now = Date.now();
+    if (now - lastTime < delay) return;
+    lastTime = now;
+    fn(...args);
+  };
+}
+
+function logMessage(msg) {
+  console.log("Message:", msg, "at", new Date().toLocaleTimeString());
+}
+
+const throttledLog = throttle((e) => logMessage(e.target.value), 2000);
+
+// document.getElementById("input").addEventListener("input", throttledLog);
+
+const arrow = (e) => {
+  return console.log(e);
+};
+arrow("arrow");
+function func(e) {
+  return console.log(e);
+}
+func("function");
+
+const searchInput = document.querySelector("#search");
+// searchInput.addEventListener("input", function (e) {
+//   console.log("Arguments: ", e);
+//   console.log("This: ", this);
+//   console.log("This value: ", this.value);
+// });
+searchInput.addEventListener("input", (e) => {
+  console.log("Arguments: ", e);
+  console.log("This: ", this);
+  console.log("This value: ", this.value);
+  console.log("Event target value: ", e.target.value);
+});

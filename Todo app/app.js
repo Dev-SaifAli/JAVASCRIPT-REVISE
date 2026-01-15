@@ -209,15 +209,13 @@ function searchTasks(query) {
   const q = query.trim().toLowerCase();
   const filtered = tasks.filter((t) => t.title.toLowerCase().includes(q));
   console.log(filtered);
-
+  console.log(this);
   renderTasks(filtered);
 }
 
 const debouncedSearch = debounce((e) => {
   searchTasks(e.target.value);
 }, 1000);
-
-searchInput.addEventListener("input", debouncedSearch);
 
 function renderTasks(tasks) {
   console.log("renderTasks call();");
@@ -552,7 +550,7 @@ function throttle(fn, limit) {
     if (!inThrottle) {
       fn.apply(this, args);
       inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+      setTimeout(() => (inThrottle = false), limit);
     }
   };
 }
