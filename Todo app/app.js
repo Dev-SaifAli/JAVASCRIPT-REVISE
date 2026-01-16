@@ -191,6 +191,8 @@ undoBtn.addEventListener("click", () => {
   renderTasks(tasks);
 });
 
+
+// Debounce function
 function debounce(fn, delay) {
   let timer;
 
@@ -216,6 +218,10 @@ function searchTasks(query) {
 const debouncedSearch = debounce((e) => {
   searchTasks(e.target.value);
 }, 1000);
+
+searchInput.addEventListener("input", debouncedSearch);
+
+
 
 function renderTasks(tasks) {
   console.log("renderTasks call();");
