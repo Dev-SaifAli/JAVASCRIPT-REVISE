@@ -77,6 +77,7 @@ const titlesSet = new Set();
 
 function isDuplicateTitle(title) {
   // const titles = getTitlesSet(tasks);
+  console.log(titlesSet);
   return titlesSet.has(title.toLowerCase());
 }
 
@@ -191,7 +192,6 @@ undoBtn.addEventListener("click", () => {
   renderTasks(tasks);
 });
 
-
 // Debounce function
 function debounce(fn, delay) {
   let timer;
@@ -220,8 +220,6 @@ const debouncedSearch = debounce((e) => {
 }, 1000);
 
 searchInput.addEventListener("input", debouncedSearch);
-
-
 
 function renderTasks(tasks) {
   console.log("renderTasks call();");
@@ -316,8 +314,8 @@ function renderTasks(tasks) {
     tr.innerHTML = `
     <td>
       <input type="checkbox" class="task-check" data-id="${id}" ${
-      completed ? "checked" : ""
-    }>
+        completed ? "checked" : ""
+      }>
     </td>
     <td>${id}</td>
     <td class="task-title">${title}</td>
