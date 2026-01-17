@@ -66,7 +66,7 @@ function loadTasks() {
   return JSON.parse(localStorage.getItem("tasks")) || [];
 }
 
-const titlesSet = new Set();
+const titlesSet = new Set(tasks.map((t) => t.title.toLowerCase()));
 
 // function getTitlesSet(tasks) {
 //   // First, map array method  transforms the tasks array and returns an array of 'titles' from each task object in 'lowercase'.
@@ -76,7 +76,6 @@ const titlesSet = new Set();
 // }
 
 function isDuplicateTitle(title) {
-  // const titles = getTitlesSet(tasks);
   console.log(titlesSet);
   return titlesSet.has(title.toLowerCase());
 }
