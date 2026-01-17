@@ -65,15 +65,16 @@ function loadTasks() {
   return JSON.parse(localStorage.getItem("tasks")) || [];
 }
 
-function getTitlesSet(tasks) {
-  // First, array method map transforms the tasks array and returns an array of titles from each task object in 'lowercase'.
-  // Then, Set converts that array into an object of unique values.
+// function getTitlesSet(tasks) {
+//   // First, array method map transforms the tasks array and returns an array of titles from each task object in 'lowercase'.
+//   // Then, Set converts that array into an object of unique values.
 
-  return new Set(tasks.map((t) => t.title.toLowerCase()));
-}
+//   return new Set(tasks.map((t) => t.title.toLowerCase()));
+// }
 
+const titlesSet = new Set(tasks.map((t) => t.title.toLowerCase()));
 function isDuplicateTitle(title) {
-  const titles = getTitlesSet(tasks);
+  const titles = titlesSet;
   return titles.has(title.toLowerCase());
 }
 
@@ -280,8 +281,8 @@ function renderTasks(tasks) {
     tr.innerHTML = `
     <td>
       <input type="checkbox" class="task-check" data-id="${id}" ${
-      completed ? "checked" : ""
-    }>
+        completed ? "checked" : ""
+      }>
     </td>
     <td>${id}</td>
     <td class="task-title">${title}</td>
