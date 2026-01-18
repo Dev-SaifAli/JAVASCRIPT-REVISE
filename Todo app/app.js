@@ -59,11 +59,30 @@ let tasks = loadTasks();
 
 // State & Persistence
 function saveTasks() {
-  localStorage.setItem("tasks", JSON.stringify(tasks));
+  try {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    return true;
+  } catch (error) {
+    if (error.name === "QuotaExceededError") {
+      alert("Storage full! Please delete some tasks.");
+    } else {
+      console.error("Failed to save tasks: ", error);
+    }
+    return false;
+  }
 }
 
 function loadTasks() {
-  return JSON.parse(localStorage.getItem("tasks")) || [];
+  // return JSON.parse(localStorage.getItem("tasks")) || [];
+  // What if localStorage full and json.parse fails
+
+  try {
+    const data = localStorage.getItem("tasks");
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error("Failed to load tasks: ", error);
+    return [];
+  }
 }
 
 const titlesSet = new Set(tasks.map((t) => t.title.toLowerCase()));
