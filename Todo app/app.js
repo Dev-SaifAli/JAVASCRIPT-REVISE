@@ -216,8 +216,6 @@ searchInput.addEventListener("input", debouncedSearch);
 function renderTasks(tasks) {
   console.log("renderTasks call();");
 
-  // tbody.innerHTML = "";
-
   if (tasks.length === 0) {
     tbody.innerHTML = `<tr id="defaultText">
                         <td colspan='100%'>
@@ -233,75 +231,106 @@ function renderTasks(tasks) {
 
     return;
   }
+  // Clear defaultText if it exists.
 
   const defaultText = tbody.querySelector("#defaultText");
   if (defaultText) {
     defaultText.remove();
   }
 
+  // Build MAP of existing rows
+  const existingRows = new Map();
+  tbody.querySelectorAll("tr[data-id]").forEach((row) => {
+    existingRows.set(Number(row.dataset.id), row);
+  });
+
+  // Get current task IDs
   const taskIDs = new Set(tasks.map((t) => t.id));
-  const existingRows = tbody.querySelectorAll("tr[data-id]");
-  existingRows.forEach((row) => {
-    const rowID = Number(row.dataset.id);
-    if (!taskIDs.has(rowID)) {
+
+  // Remove rows for deleted tasks
+  existingRows.forEach((row, id) => {
+    if (!taskIDs.has(id)) {
       row.remove();
     }
   });
 
+  // Update the existing row
+
   tasks.forEach((task) => {
-    const { id, title, notes, completed, createdAt, meta } = task;
-    const {
-      priority = "normal",
-      category = "general",
-      dueDate = "-",
-    } = meta || {};
+    const existingRow = existingRows.get(task.id);
 
-    const row = tbody.querySelector(`tr[data-id="${id}"]`);
-    console.log(row);
-    if (row) {
-      // Update checkbox
-      const checkbox = row.querySelector(".task-check");
-      if (checkbox) checkbox.checked = completed;
-
-      // Update status cell
-      const statusCell = row.querySelector(".task-status");
-      if (statusCell) statusCell.textContent = completed ? "✅" : "❌";
-
-      // Update row class
-      if (completed) {
-        row.classList.add("table-active");
-      } else {
-        row.classList.remove("table-active");
-      }
+    if (existingRow) {
+      updateTaskRow(existingRow, task);
     } else {
-      const tr = document.createElement("tr");
-      // Industry Tip: Set a data-id on the row for easy lookup
-      tr.dataset.id = id;
+      const newRow = createTaskRow(task);
+      tbody.appendChild(newRow);
+    }
+  });
+}
 
-      // Format date once outside the loop if possible, or as a helper
-      const formattedDate = new Date(createdAt).toISOString().split("T")[0];
+function createTaskRow(task) {
+  const { id, title, notes, completed, createdAt, meta } = task;
+  const {
+    priority = "normal",
+    category = "general",
+    dueDate = "-",
+  } = meta || {};
 
-      tr.innerHTML = `
-    <td>
-      <input type="checkbox" class="task-check" data-id="${id}" }>
-    </td>
-    <td>${id}</td>
-    <td class="task-title">${title}</td>
-    <td>${notes}</td>
-    <td class="task-status">❌</td>
-    <td>${formattedDate}</td>
-    <td><span class="badge priority-${priority}">${priority}</span></td>
-    <td>${category}</td>
-    <td>${dueDate}</td>
+  const tr = document.createElement("tr");
+  // Industry Tip: Set a data-id on the row for easy lookup
+  tr.dataset.id = id;
+  const formattedDate = new Date(createdAt).toISOString().split("T")[0];
+
+  tr.innerHTML = `
+    <td><input type="checkbox" class="task-check" data-id="${id}" ${completed ? "checked" : ""}></td>
+    <td class="task-id"></td>
+    <td class="task-title"></td>
+    <td class="task-notes"></td>
+    <td class="task-status"></td>
+    <td class="task-date"></td>
+    <td class="task-priority"></span></td>
+    <td class="task-category"></td>
+    <td class="task-dueDate"></td>
     <td>
       <button class="btn-delete" data-id="${id}">Delete</button>
       <button class="btn-edit" data-id="${id}">Edit</button>
     </td>
   `;
 
-      tbody.appendChild(tr);
-    }
-  });
+  tr.querySelector(".task-id").textContent = id;
+  tr.querySelector(".task-title").textContent = title;
+  tr.querySelector(".task-notes").textContent = notes;
+  tr.querySelector(".task-status").textContent = completed ? "✅" : "❌";
+  tr.querySelector(".task-date").textContent = formattedDate;
+  tr.querySelector(".task-date").textContent = createdAt;
+  tr.querySelector(".task-category").textContent = category;
+  tr.querySelector(".task-dueDate").textContent = dueDate;
+
+  const priorityCell = tr.querySelector(".task-priority");
+  const span = document.createElement("span");
+  span.className = `badge badge-${priority}`;
+  priorityCell.appendChild(span);
+  priorityCell.textContent = priority;
+
+  return tr;
+}
+
+function updateTaskRow(row, task) {
+  const { title, notes, completed } = task;
+
+  const checkbox = row.querySelector(".task-check");
+  if (checkbox) checkbox.checked = completed;
+
+  // Update status cell
+  const statusCell = row.querySelector(".task-status");
+  if (statusCell) statusCell.textContent = completed ? "✅" : "❌";
+
+  // Update row class
+  if (completed) {
+    row.classList.add("table-active");
+  } else {
+    row.classList.remove("table-active");
+  }
 }
 
 // ➡️ Event Delegation
