@@ -73,7 +73,7 @@ function saveTasks() {
 }
 
 function loadTasks() {
-  // return JSON.parse(localStorage.getItem("tasks")) || [];
+  // bad: return JSON.parse(localStorage.getItem("tasks")) || [];
   // What if localStorage full and json.parse fails
 
   try {
@@ -91,6 +91,17 @@ function isDuplicateTitle(title) {
   console.log(titlesSet);
   return titlesSet.has(title.toLowerCase());
 }
+class Task {
+  constructor({ title, notes = "", meta = {} }) {
+    const timestamp = Date.now();
+    this.id = timestamp;
+    this.title = title;
+    this.notes = notes;
+    this._completed = false;
+    this.createdAt = timestamp;
+    this.meta = meta;
+  }
+}
 
 async function addTask(taskData) {
   // Object is passed here...
@@ -98,6 +109,7 @@ async function addTask(taskData) {
   showLoading();
 
   const task = await fakeCreateTask(taskData);
+
   titlesSet.add(task.title.toLowerCase());
 
   console.log("Before:", tasks);
@@ -109,11 +121,12 @@ async function addTask(taskData) {
 
   hideLoading();
 }
+
 function fakeCreateTask(taskData) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(createTask(taskData));
-    }, 1000);
+      resolve(new Task(taskData));
+    }, 300);
   });
 }
 
@@ -126,16 +139,16 @@ function hideLoading() {
   addBtn.innerText = "Add Task";
 }
 
-function createTask({ title, notes = "", meta = {} }) {
-  return {
-    id: Date.now(),
-    title,
-    notes,
-    completed: false,
-    createdAt: Date.now(),
-    meta,
-  };
-}
+// function createTask({ title, notes = "", meta = {} }) {
+//   return {
+//     id: Date.now(),
+//     title,
+//     notes,
+//     completed: false,
+//     createdAt: Date.now(),
+//     meta,
+//   };
+// }
 
 function createUndoManager() {
   let lastDeletedTask = null;
