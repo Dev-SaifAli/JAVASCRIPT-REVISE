@@ -101,6 +101,10 @@ class Task {
     this.createdAt = timestamp;
     this.meta = meta;
   }
+
+  toggle() {
+    this.completed = !this.completed;
+  }
 }
 
 async function addTask(taskData) {
