@@ -92,6 +92,9 @@ function isDuplicateTitle(title) {
   return titlesSet.has(title.toLowerCase());
 }
 class Task {
+  
+  // Initialize properties for the objects
+
   constructor({ title, notes = "", meta = {} }) {
     const timestamp = Date.now();
     this.id = timestamp;
