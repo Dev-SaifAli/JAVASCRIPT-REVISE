@@ -1,3 +1,44 @@
+class Task {
+  // Initialize properties for the objects
+
+  constructor({ title, notes = "", meta = {} }) {
+    const timestamp = Date.now();
+    this.id = timestamp;
+    this.title = title;
+    this.notes = notes;
+    this.completed = false;
+    this.createdAt = timestamp;
+    this.meta = meta;
+  }
+
+  toggle() {
+    this.completed = !this.completed;
+  }
+
+  matches(query) {
+    const q = query.toLowerCase();
+    return (
+      this.title.toLowerCase().includes(q) ||
+      this.notes.toLowerCase().includes(q)
+    );
+  }
+
+  toJSON() {
+    return {
+      id: this.id,
+      title: this.title,
+      notes: this.notes,
+      completed: this.completed,
+      createdAt: this.createdAt,
+      meta: this.meta,
+    };
+  }
+
+  static fromJSON(json) {
+    return new Task(json);
+  }
+}
+
 const undoBtn = document.getElementById("undoBtn");
 const addBtn = document.querySelector(".addBtn");
 const tbody = document.getElementById("task-list");
@@ -90,24 +131,6 @@ const titlesSet = new Set(tasks.map((t) => t.title.toLowerCase()));
 function isDuplicateTitle(title) {
   console.log(titlesSet);
   return titlesSet.has(title.toLowerCase());
-}
-class Task {
-  
-  // Initialize properties for the objects
-
-  constructor({ title, notes = "", meta = {} }) {
-    const timestamp = Date.now();
-    this.id = timestamp;
-    this.title = title;
-    this.notes = notes;
-    this._completed = false;
-    this.createdAt = timestamp;
-    this.meta = meta;
-  }
-
-  toggle() {
-    this.completed = !this.completed;
-  }
 }
 
 async function addTask(taskData) {
