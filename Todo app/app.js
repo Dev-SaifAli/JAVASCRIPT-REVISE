@@ -1,14 +1,22 @@
 class Task {
   // Initialize properties for the objects
+  static nextID = 1;
 
-  constructor({ title, notes = "", meta = {} }) {
-    const timestamp = Date.now();
-    this.id = timestamp;
-    this.title = title;
-    this.notes = notes;
-    this.completed = false;
-    this.createdAt = timestamp;
-    this.meta = meta;
+  constructor(data) {
+    if (data.id) {
+      this.id = data.id;
+
+      if (data.id >= Task.nextID) {
+        Task.nextID = data.id + 1;
+      }
+    } else {
+      this.id = Task.nextID++;
+    }
+    this.title = data.title || "";
+    this.notes = data.notes || "";
+    this.completed = data.completed || false;
+    this.createdAt = data.createdAt || Date.now();
+    this.meta = data.meta || {};
   }
 
   toggle() {
