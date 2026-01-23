@@ -47,6 +47,40 @@ class Task {
   }
 }
 
+function loadTasks() {
+  try {
+    const data = localStorage.getItem("tasks");
+
+    if (!data) return [];
+
+    const parsed = JSON.parse(data);
+
+    const tasks = parsed.map(Task.fromJSON);
+
+    // if (tasks.length > 0) {
+    //   const maxId = Math.max(...tasks.map((t) => t.id));
+    //   Task.nextID = maxId + 1;
+    // }
+
+    return tasks;
+  } catch (error) {
+    console.error("Failed to load tasks: ", error);
+    return [];
+  }
+}
+
+function saveTasks() {
+  try {
+    const json = tasks.map((task) => task.toJSON());
+
+    localStorage.setItem("tasks", JSON.stringify(json));
+    return true;
+  } catch (error) {
+    console.error("Failed to save tasks:", error);
+    return false;
+  }
+}
+
 const undoBtn = document.getElementById("undoBtn");
 const addBtn = document.querySelector(".addBtn");
 const tbody = document.getElementById("task-list");
@@ -107,32 +141,6 @@ todoForm.addEventListener("submit", (e) => {
 let tasks = loadTasks();
 
 // State & Persistence
-function saveTasks() {
-  try {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    return true;
-  } catch (error) {
-    if (error.name === "QuotaExceededError") {
-      alert("Storage full! Please delete some tasks.");
-    } else {
-      console.error("Failed to save tasks: ", error);
-    }
-    return false;
-  }
-}
-
-function loadTasks() {
-  // bad: return JSON.parse(localStorage.getItem("tasks")) || [];
-  // What if localStorage full and json.parse fails
-
-  try {
-    const data = localStorage.getItem("tasks");
-    return data ? JSON.parse(data) : [];
-  } catch (error) {
-    console.error("Failed to load tasks: ", error);
-    return [];
-  }
-}
 
 const titlesSet = new Set(tasks.map((t) => t.title.toLowerCase()));
 
