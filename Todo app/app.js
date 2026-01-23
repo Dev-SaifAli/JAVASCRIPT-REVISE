@@ -16,7 +16,7 @@ class Task {
     this.notes = data.notes || "";
     this.completed = data.completed || false;
     this.createdAt = data.createdAt || Date.now();
-    this.meta = meta || {};
+    this.meta = data.meta || {};
   }
 
   toggle() {
