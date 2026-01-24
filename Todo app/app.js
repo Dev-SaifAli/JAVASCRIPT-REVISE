@@ -434,20 +434,11 @@ tbody.addEventListener("click", function (e) {
 });
 
 function toggleTask(taskId) {
-  console.log("Previous:", tasks);
-
-  // 1. Convert tasks array into a MAP with id -> task
-  const map = new Map(tasks.map((t) => [t.id, t]));
-
-  // 2. Get the required task by id
-  const task = map.get(taskId);
+  const task = tasks.find((t) => t.id === taskId);
   if (!task) return;
-
-  // 3. Update the task : flip completed true/false
-
-  map.set(taskId, { ...task, completed: !task.completed });
-  tasks = Array.from(map.values());
+  task.toggle();
   console.log("toggle:", tasks);
+
   saveTasks();
   renderTasks(tasks);
 }
