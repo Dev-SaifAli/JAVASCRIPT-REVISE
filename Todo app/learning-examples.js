@@ -266,3 +266,15 @@ function Task(title) {
 const t1 = new Task("Exercise");
 t1.sayHi();
 
+
+// 1. Convert tasks array into a MAP with id -> task
+  const map = new Map(tasks.map((t) => [t.id, t]));
+
+  // 2. Get the required task by id
+  const task = map.get(taskId);
+  if (!task) return;
+
+  // 3. Update the task : flip completed true/false
+
+  map.set(taskId, { ...task, completed: !task.completed });
+  tasks = Array.from(map.values());
