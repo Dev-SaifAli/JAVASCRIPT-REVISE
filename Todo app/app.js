@@ -185,17 +185,6 @@ function hideLoading() {
   addBtn.innerText = "Add Task";
 }
 
-// function createTask({ title, notes = "", meta = {} }) {
-//   return {
-//     id: Date.now(),
-//     title,
-//     notes,
-//     completed: false,
-//     createdAt: Date.now(),
-//     meta,
-//   };
-// }
-
 function createUndoManager() {
   let lastDeletedTask = null;
   let lastIndex = null;
@@ -240,11 +229,6 @@ function deleteTask(taskId) {
   undoBtn.disabled = false;
   saveTasks();
   renderTasks(tasks);
-
-  // tasks = tasks.filter((task) => task.id !== taskId);
-  // console.log("tasks", tasks);
-  // saveTasks();
-  // renderTasks(tasks);
 }
 
 undoBtn.addEventListener("click", () => {
@@ -278,16 +262,20 @@ function debounce(fn, delay) {
 }
 
 function searchTasks(query) {
-  const q = query.trim().toLowerCase();
-  const filtered = tasks.filter((t) => t.title.toLowerCase().includes(q));
+  const q = query.trim();
+  if (!q) {
+    renderTasks(tasks);
+    return;
+  }
+  const filtered = tasks.filter((t) => t.matches(q));
   console.log(filtered);
   console.log(this);
   renderTasks(filtered);
 }
-
+const SEARCH_DEBOUNCE_MS = 300;
 const debouncedSearch = debounce((e) => {
   searchTasks(e.target.value);
-}, 1000);
+}, SEARCH_DEBOUNCE_MS);
 
 searchInput.addEventListener("input", debouncedSearch);
 
