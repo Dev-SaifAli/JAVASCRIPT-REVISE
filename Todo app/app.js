@@ -46,6 +46,96 @@ class Task {
     return new Task(json);
   }
 }
+class TaskManager {
+  constructor() {
+    this.tasks = [];
+    this.undoManager = this.createUndoManager();
+  }
+  add(taskData) {
+    if (!taskData.title || !taskData.title.trim()) {
+      throw new Error("Title is required.");
+    }
+    if (this.isDuplicate(taskData.title)) {
+      throw new Error("Task already exists!");
+    }
+    const task = new Task(taskData);
+    this.tasks.push(task);
+    return task;
+  }
+
+  delete(taskId) {
+    const index = this.tasks.findIndex((t) => t.id === taskId);
+    if (index === -1) return null;
+    const [deletedTask] = this.tasks.splice(index, 0);
+    this.createUndoManager.save(deletedTask, index);
+    return deletedTask;
+  }
+
+  toggle(taskId) {
+    const task = this.tasks.find((t) => t.id === taskId);
+    if (!task) return null;
+    task.toggle();
+    return task;
+  }
+
+  undoDelete() {
+    const data = this.createUndoManager.undo();
+    tasks = this.tasks.splice(data.index, 0, data.task);
+    return data.task;
+  }
+
+  search(query) {
+    if (!query || !query.trim()) {
+      return this.tasks;
+    }
+    return this.tasks.filter((task) => task.matches(query));
+  }
+
+  isDuplicate(title) {
+    return this.tasks.some(
+      (t) => t.title.toLowerCase() === title.toLowerCase(),
+    );
+  }
+
+  getAll() {
+    return this.tasks;
+  }
+
+  getById(id) {
+    return this.tasks.find((t) => t.id === id);
+  }
+
+  // SERIALIZATION
+  toJSON() {
+    return this.tasks.map((task) => task.toJSON());
+  }
+  fromJSON(data) {
+    this.tasks = data.map(Task.fromJSON);
+  }
+
+  createUndoManager() {
+    let lastDeletedTask;
+    let lastIndex;
+
+    return {
+      save(task, index) {
+        lastDeletedTask = task;
+        lastIndex = index;
+      },
+      undo() {
+        if (!lastDeletedTask) return null;
+        const data = { task: lastDeletedTask, index: lastIndex };
+        lastDeletedTask = null;
+        lastIndex = null;
+        return data;
+      },
+      canUndo() {
+        return lastDeletedTask !== null;
+      },
+    };
+  }
+}
+const taskManager = new TaskManager();
 
 function loadTasks() {
   try {
@@ -54,15 +144,12 @@ function loadTasks() {
     if (!data) return [];
 
     const parsed = JSON.parse(data);
-
-    const tasks = parsed.map(Task.fromJSON);
+    taskManager.fromJSON(parsed);
 
     // if (tasks.length > 0) {
     //   const maxId = Math.max(...tasks.map((t) => t.id));
     //   Task.nextID = maxId + 1;
     // }
-
-    return tasks;
   } catch (error) {
     console.error("Failed to load tasks: ", error);
     return [];
@@ -71,7 +158,7 @@ function loadTasks() {
 
 function saveTasks() {
   try {
-    const json = tasks.map((task) => task.toJSON());
+    const json = taskManager.toJSON();
 
     localStorage.setItem("tasks", JSON.stringify(json));
     return true;
@@ -139,15 +226,6 @@ todoForm.addEventListener("submit", (e) => {
 });
 
 let tasks = loadTasks();
-
-// State & Persistence
-
-const titlesSet = new Set(tasks.map((t) => t.title.toLowerCase()));
-
-function isDuplicateTitle(title) {
-  console.log(titlesSet);
-  return titlesSet.has(title.toLowerCase());
-}
 
 async function addTask(taskData) {
   // Object is passed here...
