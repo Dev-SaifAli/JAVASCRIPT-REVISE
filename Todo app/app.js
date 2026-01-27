@@ -66,8 +66,8 @@ class TaskManager {
   delete(taskId) {
     const index = this.tasks.findIndex((t) => t.id === taskId);
     if (index === -1) return null;
-    const [deletedTask] = this.tasks.splice(index, 0);
-    this.createUndoManager.save(deletedTask, index);
+    const [deletedTask] = this.tasks.splice(index, 1);
+    this.undoManager.save(deletedTask, index);
     return deletedTask;
   }
 
@@ -79,8 +79,8 @@ class TaskManager {
   }
 
   undoDelete() {
-    const data = this.createUndoManager.undo();
-    tasks = this.tasks.splice(data.index, 0, data.task);
+    const data = this.undoManager.undo();
+    this.tasks.splice(data.index, 0, data.task);
     return data.task;
   }
 
@@ -186,43 +186,23 @@ const longDate = today.toLocaleDateString("en-US", {
 });
 headerDate.innerText = longDate;
 
-todoForm.addEventListener("submit", (e) => {
+todoForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const form = e.target;
 
-  const title = form.title.value.trim();
-
-  if (!title) {
-    alert("Please enter the title...");
-    return;
-  }
-
-  if (isDuplicateTitle(title)) {
-    alert("Task already exists");
-    return;
-  }
-
-  const priority = form.priority.value;
-  const category = form.category.value;
-  const dueDate = form.dueDate.value;
-  const notes = form.notes.value.trim();
-
   const taskData = {
-    title,
-    notes,
-    meta: { priority, category, dueDate },
+    title: form.title.value.trim(),
+    notes: form.notes.value.trim(),
+    meta: {
+      priority: form.priority.value,
+      category: form.category.value,
+      dueDate: form.dueDate.value,
+    },
   };
 
-  console.log(taskData);
-  addTask(taskData);
+  
 
-  form.reset();
-
-  const modalInstance = bootstrap.Modal.getInstance(formModal);
-  if (modalInstance) {
-    modalInstance.hide();
-  }
 });
 
 let tasks = loadTasks();
