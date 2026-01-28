@@ -201,8 +201,20 @@ todoForm.addEventListener("submit", async (e) => {
     },
   };
 
-  
+  try {
+    showLoading();
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    taskManager.add(taskData);
+    saveTasks();
+    renderTasks(taskManager.getAll());
 
+    form.reset();
+    bootstrap.Modal.getInstance(formModal)?.hide();
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    hideLoading();
+  }
 });
 
 let tasks = loadTasks();
