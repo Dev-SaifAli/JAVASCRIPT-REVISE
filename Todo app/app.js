@@ -65,6 +65,7 @@ class TaskManager {
 
   delete(taskId) {
     const index = this.tasks.findIndex((t) => t.id === taskId);
+
     if (index === -1) return null;
     const [deletedTask] = this.tasks.splice(index, 1);
     this.undoManager.save(deletedTask, index);
@@ -80,6 +81,7 @@ class TaskManager {
 
   undoDelete() {
     const data = this.undoManager.undo();
+    if (!data) return null;
     this.tasks.splice(data.index, 0, data.task);
     return data.task;
   }
@@ -111,6 +113,11 @@ class TaskManager {
   }
   fromJSON(data) {
     this.tasks = data.map(Task.fromJSON);
+
+    if (this.tasks.length > 0) {
+      const maxId = Math.max(...this.tasks.map((t) => t.id));
+      Task.nextID = maxId + 1;
+    }
   }
 
   createUndoManager() {
@@ -140,16 +147,10 @@ const taskManager = new TaskManager();
 function loadTasks() {
   try {
     const data = localStorage.getItem("tasks");
-
     if (!data) return [];
 
     const parsed = JSON.parse(data);
-    taskManager.fromJSON(parsed);
-
-    // if (tasks.length > 0) {
-    //   const maxId = Math.max(...tasks.map((t) => t.id));
-    //   Task.nextID = maxId + 1;
-    // }
+    taskManager.fromJSON(parsed); // returns an array of task objects.
   } catch (error) {
     console.error("Failed to load tasks: ", error);
     return [];
@@ -158,7 +159,7 @@ function loadTasks() {
 
 function saveTasks() {
   try {
-    const json = taskManager.toJSON();
+    const json = taskManager.toJSON(); // returns an array of plain js objects.
 
     localStorage.setItem("tasks", JSON.stringify(json));
     return true;
@@ -217,35 +218,6 @@ todoForm.addEventListener("submit", async (e) => {
   }
 });
 
-let tasks = loadTasks();
-
-async function addTask(taskData) {
-  // Object is passed here...
-
-  showLoading();
-
-  const task = await fakeCreateTask(taskData);
-
-  titlesSet.add(task.title.toLowerCase());
-
-  console.log("Before:", tasks);
-  tasks = [...tasks, task];
-  console.log("After:", tasks);
-
-  saveTasks();
-  renderTasks(tasks);
-
-  hideLoading();
-}
-
-function fakeCreateTask(taskData) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(new Task(taskData));
-    }, 300);
-  });
-}
-
 function showLoading() {
   addBtn.disabled = true;
   addBtn.innerText = "Saving...";
@@ -255,65 +227,40 @@ function hideLoading() {
   addBtn.innerText = "Add Task";
 }
 
-function createUndoManager() {
-  let lastDeletedTask = null;
-  let lastIndex = null;
+// ➡️ Event Delegation
+tbody.addEventListener("click", function (e) {
+  const { target } = e;
+  const taskId = Number(target.dataset.id);
+  console.log(e);
+  console.log(e.currentTarget);
+  console.log(e.target);
 
-  return {
-    save(task, index) {
-      lastDeletedTask = task;
-      lastIndex = index;
-    },
+  // Delete button clicked
+  if (target.classList.contains("btn-delete") && taskId) {
+    console.log(taskId);
 
-    undo() {
-      if (!lastDeletedTask) return null;
+    const deleted = taskManager.delete(taskId);
+    if (deleted) {
+      saveTasks();
+      searchInput.value = "";
+      renderTasks(taskManager.getAll());
+      undoBtn.disabled = false;
+    }
+  }
 
-      const data = { task: lastDeletedTask, index: lastIndex };
-
-      lastDeletedTask = null;
-      lastIndex = null;
-
-      return data;
-    },
-  };
-}
-
-const undoManager = createUndoManager(); // returns an object having save() and undo() methods
-
-function deleteTask(taskId) {
-  // Execute the function for each array element.
-  // Returns the index of 1st element that passes the condition;
-
-  const index = tasks.findIndex((t) => t.id === taskId);
-  if (index === -1) return;
-
-  // Modifies the original array and deleted the taskObject present at that index. Returns the array with the deleted taskObject.
-
-  // Destructuring; and store the value of the 1st element into a deletedTask variable.
-
-  const [deletedTask] = tasks.splice(index, 1);
-  console.log(tasks);
-
-  undoManager.save(deletedTask, index);
-
-  undoBtn.disabled = false;
-  saveTasks();
-  renderTasks(tasks);
-}
-
+  if (target.classList.contains("task-check") && taskId) {
+    taskManager.toggle(taskId);
+    saveTasks();
+    renderTasks(taskManager.getAll());
+  }
+});
 undoBtn.addEventListener("click", () => {
-  const data = undoManager.undo();
-  if (!data) return;
-
-  tasks = [
-    ...tasks.slice(0, data.index),
-    data.task,
-    ...tasks.slice(data.index),
-  ];
-
-  undoBtn.disabled = true;
-  saveTasks();
-  renderTasks(tasks);
+  const restored = taskManager.undoDelete();
+  if (restored) {
+    saveTasks();
+    renderTasks(taskManager.getAll());
+    undoBtn.disabled = true;
+  }
 });
 
 // Debounce function
@@ -331,26 +278,17 @@ function debounce(fn, delay) {
   };
 }
 
-function searchTasks(query) {
-  const q = query.trim();
-  if (!q) {
-    renderTasks(tasks);
-    return;
-  }
-  const filtered = tasks.filter((t) => t.matches(q));
-  console.log(filtered);
-  console.log(this);
-  renderTasks(filtered);
-}
 const SEARCH_DEBOUNCE_MS = 300;
 const debouncedSearch = debounce((e) => {
-  searchTasks(e.target.value);
+  const results = taskManager.search(e.target.value);
+  renderTasks(results);
 }, SEARCH_DEBOUNCE_MS);
 
 searchInput.addEventListener("input", debouncedSearch);
 
 function renderTasks(tasks) {
   console.log("renderTasks call();");
+  console.log(tasks);
 
   if (tasks.length === 0) {
     tbody.innerHTML = `<tr id="defaultText">
@@ -438,15 +376,14 @@ function createTaskRow(task) {
   tr.querySelector(".task-notes").textContent = notes;
   tr.querySelector(".task-status").textContent = completed ? "✅" : "❌";
   tr.querySelector(".task-date").textContent = formattedDate;
-  tr.querySelector(".task-date").textContent = createdAt;
   tr.querySelector(".task-category").textContent = category;
   tr.querySelector(".task-dueDate").textContent = dueDate;
 
   const priorityCell = tr.querySelector(".task-priority");
   const span = document.createElement("span");
   span.className = `badge badge-${priority}`;
+  span.textContent = priority;
   priorityCell.appendChild(span);
-  priorityCell.textContent = priority;
 
   return tr;
 }
@@ -461,6 +398,12 @@ function updateTaskRow(row, task) {
   const statusCell = row.querySelector(".task-status");
   if (statusCell) statusCell.textContent = completed ? "✅" : "❌";
 
+  const titleCell = row.querySelector(".task-title");
+  if (titleCell) titleCell.textContent = title;
+
+  const notesCell = row.querySelector(".task-notes");
+  if (notesCell) notesCell.textContent = notes;
+
   // Update row class
   if (completed) {
     row.classList.add("table-active");
@@ -469,37 +412,6 @@ function updateTaskRow(row, task) {
   }
 }
 
-// ➡️ Event Delegation
-
-tbody.addEventListener("click", function (e) {
-  // const target = e.target;
-
-  const { target } = e;
-  const { id } = target.dataset;
-  console.log(e);
-  console.log(e.currentTarget);
-  console.log(e.target);
-
-  // Delete button clicked
-  if (target.className === "btn-delete" && id) {
-    console.log(id);
-    deleteTask(Number(id));
-  }
-
-  if (target.type === "checkbox" && id) {
-    toggleTask(Number(id));
-  }
-});
-
-function toggleTask(taskId) {
-  const task = tasks.find((t) => t.id === taskId);
-  if (!task) return;
-  task.toggle();
-  console.log("toggle:", tasks);
-
-  saveTasks();
-  renderTasks(tasks);
-}
-
 // Init
-renderTasks(tasks);
+loadTasks();
+renderTasks(taskManager.getAll());
