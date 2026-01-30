@@ -98,13 +98,23 @@ class TaskManager {
       (t) => t.title.toLowerCase() === title.toLowerCase(),
     );
   }
-
   getAll() {
     return this.tasks;
   }
 
   getById(id) {
     return this.tasks.find((t) => t.id === id);
+  }
+  update(taskId, updatedData) {
+    const task = this.getById(taskId);
+    if (!task) return null;
+
+    task.title = updatedData.title || task.title;
+    task.notes = updatedData.notes || task.notes;
+
+    task.meta = { ...task.meta, ...updatedData.meta };
+
+    return task;
   }
 
   // SERIALIZATION
@@ -172,13 +182,14 @@ function saveTasks() {
 const undoBtn = document.getElementById("undoBtn");
 const addBtn = document.querySelector(".addBtn");
 const tbody = document.getElementById("task-list");
-const todoForm = document.getElementById("todoForm");
+const todoForm = document.querySelector("#todoForm");
 const formModal = document.getElementById("todoModal");
 const headerDate = document.querySelector("#date");
 const searchInput = document.querySelector("#searchInput");
+const editForm = document.getElementById("editForm");
+const editModal = document.getElementById("editModal");
 
 const today = new Date();
-
 const longDate = today.toLocaleDateString("en-US", {
   weekday: "long", // Full day name (e.g., Monday)
   // year: "numeric", // Full year (e.g., 2026)
@@ -204,8 +215,16 @@ todoForm.addEventListener("submit", async (e) => {
 
   try {
     showLoading();
+
     await new Promise((resolve) => setTimeout(resolve, 300));
-    taskManager.add(taskData);
+
+    if (editingTaskId) {
+      taskManager.update(editingTaskId, taskData);
+      editingTaskId = null;
+    } else {
+      taskManager.add(taskData);
+    }
+
     saveTasks();
     renderTasks(taskManager.getAll());
 
@@ -226,6 +245,13 @@ function hideLoading() {
   addBtn.disabled = false;
   addBtn.innerText = "Add Task";
 }
+// Modal Management
+formModal.addEventListener("hide.bs.modal", () => {
+  editingTaskId = null;
+  todoForm.reset();
+  todoForm.querySelector(".modal-title").textContent = "Add Task";
+});
+let editingTaskId = null;
 
 // ➡️ Event Delegation
 tbody.addEventListener("click", function (e) {
@@ -253,7 +279,36 @@ tbody.addEventListener("click", function (e) {
     saveTasks();
     renderTasks(taskManager.getAll());
   }
+
+  if (target.classList.contains("btn-edit") && taskId) {
+    const task = taskManager.getById(taskId);
+    if (task) {
+      editingTaskId = taskId;
+    }
+
+    const { title, notes, meta } = task;
+    const {
+      priority = "normal",
+      category = "general",
+      dueDate = "-",
+    } = meta || {};
+
+    const form = todoForm;
+    console.log(form);
+    form.title.value = title;
+    form.notes.value = notes;
+    form.priority.value = priority;
+    form.category.value = category;
+    form.dueDate.value = dueDate;
+
+    form.querySelector(".modal-title").textContent = "Edit Task";
+    addBtn.textContent = "Update Task";
+
+    const modal = new bootstrap.Modal(formModal);
+    modal.show();
+  }
 });
+
 undoBtn.addEventListener("click", () => {
   const restored = taskManager.undoDelete();
   if (restored) {
@@ -367,7 +422,7 @@ function createTaskRow(task) {
     <td class="task-dueDate"></td>
     <td>
       <button class="btn-delete" data-id="${id}">Delete</button>
-      <button class="btn-edit" data-id="${id}">Edit</button>
+      <button class="btn-edit"  data-id="${id}">Edit</button>
     </td>
   `;
 

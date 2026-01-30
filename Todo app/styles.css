@@ -1,177 +1,55 @@
-/* .checked {
-  text-decoration: line-through;
-  color: #999;
-} */
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root {
+    --primary-color: #0078d4;
+    --bg-color: #f8f9fa;
 }
+
 body {
-  width: 100%;
-  height: 100%;
-  background-color: #222222 !important;
-  padding: 1rem 1rem 0;
-  color: aliceblue !important;
+    background-color: var(--bg-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.todo {
-  max-width: 100%;
-  height: 100vh;
-  position: relative;
-  background-image: url(bg-img.jpg);
-  background-size: cover;
-  background-repeat: no-repeat;
-  /* border-radius: 6px;
-  border-bottom: 0px; */
-  border: 6px 6px 0px;
-  font-family: "Plus Jakarta Sans";
-  padding: 1rem 2rem;
-  /* display: flex;
-  justify-content: center;
-  align-items: center; */
-}
-.header {
-  position: sticky;
-  top: 8px;
-  width: 100%;
-  background: rgba(2, 33, 1, 0.32);
-  border-radius: 4px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  -webkit-backdrop-filter: blur(10.9px);
-  backdrop-filter: blur(1px);
-  /* border: 1px solid rgba(255, 255, 255, 0.3); */
-  padding: 1rem;
-  display: flex column;
-
-  align-items: center;
-  h1 {
-    font-size: 1.6rem;
-  }
-  p {
-    font-size: 1rem;
-    color: #efeeee;
-  }
+.table {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-#defaultText td {
-  padding: 5rem 0;
-  text-align: center;
-  background: rgba(2, 33, 1, 0.32);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  -webkit-backdrop-filter: blur(10.9px);
-  backdrop-filter: blur(10.9px);
+.table-active {
+    background-color: #f1f1f1 !important;
+    opacity: 0.7;
 }
+
+.table-active .task-title {
+    text-decoration: line-through;
+}
+
+.badge-high { background-color: #dc3545; color: white; padding: 5px 10px; border-radius: 12px; font-size: 0.8rem; }
+.badge-normal { background-color: #ffc107; color: black; padding: 5px 10px; border-radius: 12px; font-size: 0.8rem; }
+.badge-low { background-color: #198754; color: white; padding: 5px 10px; border-radius: 12px; font-size: 0.8rem; }
 
 .defaultText {
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  h4 {
-    font-size: 2.5rem;
-  }
-  p {
-    font-size: 1rem;
-    font-weight: 200;
-    margin: 0px !important;
-  }
-}
-.fa-calendar {
-  font-size: 2rem;
-}
-.content {
-  margin-top: 16px;
-  text-align: center;
-  line-height: 1.5;
+    text-align: center;
+    padding: 50px;
+    color: #6c757d;
 }
 
-.task-actions {
-  position: absolute;
-  top: 90%;
-  left: 50%;
-  transform: translate(-50%, -70%);
-  padding: 8px 16px;
-  font-size: 1.2rem;
-  border: none;
-  border-radius: 4px;
-  font-weight: 600;
-  font-family: "Plus Jakarta Sans";
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
+.defaultText i {
+    font-size: 3rem;
+    margin-bottom: 15px;
 }
 
-.addBtn {
-  background-color: #ffd500cd;
-  padding: 8px 16px;
-  font-size: 1.2rem;
-  border: none;
-  border-radius: 4px;
-  font-weight: 600;
-  font-family: "Plus Jakarta Sans";
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-
-  &:hover {
-    background-color: #ffd500;
-  }
-  &:active {
-    outline: 2px dashed aliceblue;
-    outline-offset: 2px;
-  }
+.btn-delete {
+    color: #dc3545;
+    background: none;
+    border: none;
+    font-size: 0.9rem;
 }
 
-#undoBtn {
-  background-color: #b1b1b1cd;
-  padding: 8px 16px;
-  font-size: 1.2rem;
-  border: none;
-  border-radius: 4px;
-  font-weight: 600;
-  font-family: "Plus Jakarta Sans";
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-
-  &:disabled {
-    cursor: not-allowed;
-  }
-}
-#date {
-  margin-top: 4px;
-  font-weight: 400;
-  font-size: 1rem;
-  padding-left: 2px;
-}
-
-.user-input {
-  position: fixed;
-  bottom: 16px;
-  height: 50px;
-  padding: 8px 16px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  right: 0;
-  left: 0;
-  margin: 0 auto;
-  width: 80vw;
-  background: rgb(255, 255, 255, 0.2);
-  border-radius: 4px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  -webkit-backdrop-filter: blur(10.9px);
-  backdrop-filter: blur(1px);
-}
-input[type="text"] {
-  background-color: transparent;
-  border: none;
-  width: 100%;
-  border: none;
-  outline: none;
-  font-size: 1.25rem;
-  color: aliceblue;
+.btn-edit {
+    color: #0078d4;
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    margin-left: 10px;
 }
